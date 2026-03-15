@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Writing Practice — DailyDict</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="progress-container">
+    <div id="wp-bar" class="progress-fill" style="width: 0%"></div>
+  </div>
+
+  <div class="app-header">
+    <a href="index.html" class="back-btn">← Dashboard</a>
+    <h1>Writing Practice</h1>
+    <span id="wp-progress" style="font-size: 14px; opacity: 0.9;">0 / 0</span>
+  </div>
+
+  <div class="container">
+    <!-- Practice Card -->
+    <div class="wp-card" id="wp-card">
+      <div class="wp-hint-vi" id="wp-vi">...</div>
+      <div class="wp-hint-en" id="wp-en">...</div>
+
+      <button class="wp-audio-btn" id="wp-audio-btn">🔊 Nghe phát âm</button>
+
+      <div class="wp-input-wrap">
+        <input type="text" id="wp-input"
+               placeholder="Gõ từ tiếng Anh..."
+               autocomplete="off" autocorrect="off"
+               autocapitalize="off" spellcheck="false">
+        <button class="wp-check-btn" id="wp-check-btn">Kiểm tra</button>
+      </div>
+
+      <div id="wp-feedback" class="wp-feedback" style="display:none"></div>
+
+      <div class="wp-hints-row">
+        <button class="wp-hint-btn" id="btn-show-phonetic">💡 Xem phonetic</button>
+        <button class="wp-hint-btn" id="btn-skip">⏭ Bỏ qua</button>
+      </div>
+    </div>
+
+    <!-- Result screen -->
+    <div id="wp-result" class="wp-result">
+      <div class="result-emoji" id="result-emoji">🎉</div>
+      <h2 id="result-title">Hoàn thành!</h2>
+      <div class="result-score" id="result-score">0 / 0 đúng</div>
+      <div class="result-pct" id="result-pct">0%</div>
+
+      <div id="result-wrongs" class="result-wrongs"></div>
+
+      <div class="result-actions">
+        <button class="btn-primary" id="btn-retry-wrongs">🔄 Luyện lại từ sai</button>
+        <a href="index.html" class="btn-secondary" style="text-decoration: none;">← Về Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/storage.js"></script>
+  <script src="writing.js"></script>
+</body>
+</html>

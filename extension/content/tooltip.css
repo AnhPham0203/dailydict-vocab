@@ -1,0 +1,47 @@
+#dd-tooltip {
+  position: absolute;
+  width: 284px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+  z-index: 2147483647;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  color: #111827;
+  padding: 12px 14px;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  line-height: 1.5;
+}
+#dd-tooltip.dd-visible { opacity: 1; transform: translateY(0); }
+
+.dd-header   { display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.dd-word     { font-size: 18px; font-weight: 600; color: #111827; }
+.dd-phonetic { font-size: 12px; color: #9ca3af; }
+
+.dd-vi      { font-size: 15px; font-weight: 600; color: #4F46E5; margin-bottom: 4px; }
+.dd-en      { font-size: 13px; color: #374151; margin-bottom: 4px; }
+.dd-example { font-size: 12px; color: #9ca3af; font-style: italic; border-left: 2px solid #f3f4f6; padding-left: 8px; }
+.dd-no-data { font-size: 13px; color: #9ca3af; padding: 4px 0; }
+
+.dd-footer  { display: flex; justify-content: space-between; align-items: center;
+              margin-top: 10px; padding-top: 10px; border-top: 1px solid #f3f4f6; }
+.dd-context { font-size: 11px; color: #9ca3af; max-width: 140px;
+              white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.dd-save-btn       { background: #4F46E5; color: #fff; border: none; border-radius: 8px;
+                     padding: 6px 12px; cursor: pointer; font-size: 12px; font-weight: 500;
+                     transition: background 0.15s; white-space: nowrap; }
+.dd-save-btn:hover { background: #4338ca; }
+.dd-save-btn.saved { background: #059669; cursor: default; }
+
+.dd-loading-dots          { font-size: 18px; color: #9ca3af; letter-spacing: 2px; }
+.dd-loading-dots span     { animation: dd-blink 1.2s infinite; }
+.dd-loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.dd-loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dd-blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+
+.dd-error { color: #ef4444; font-size: 13px; text-align: center; padding: 8px 0; }

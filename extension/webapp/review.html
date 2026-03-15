@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ôn tập — DailyDict Vocab</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="progress-container">
+    <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+  </div>
+
+  <div class="app-header">
+    <a href="index.html" class="back-btn">← Dashboard</a>
+    <h1>Ôn tập hôm nay</h1>
+    <span id="progress-text" style="font-size: 14px; opacity: 0.9;">0 / 0</span>
+  </div>
+
+  <div class="container">
+    <!-- Card -->
+    <div id="card-container" class="card-container">
+      <div id="card" class="card">
+        <!-- Front -->
+        <div id="card-front">
+          <div id="word-text" class="word-display">...</div>
+          <div id="phonetic-text" class="phonetic">...</div>
+          <div class="flip-hint">Nhấn Space hoặc Click để xem nghĩa</div>
+        </div>
+        <!-- Back -->
+        <div id="card-back" style="display: none; width: 100%;">
+          <div id="definition-vi" class="definition-vi">...</div>
+          <div id="definition-en" class="definition-en">...</div>
+          <div id="example-text" class="example">...</div>
+          <div id="source-text" class="source">...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rating buttons -->
+    <div id="rating-row" class="rating-row" style="display: none">
+      <button id="rate-again" class="btn-again">Quên (1)</button>
+      <button id="rate-hard" class="btn-hard">Khó (2)</button>
+      <button id="rate-good" class="btn-good">Nhớ (3)</button>
+      <button id="rate-easy" class="btn-easy">Dễ (4)</button>
+    </div>
+
+    <!-- Done screen -->
+    <div id="done-screen" class="done-screen" style="display: none">
+      <div class="done-emoji">🎉</div>
+      <h2>Tuyệt vời!</h2>
+      <p id="done-text" style="color: var(--text-muted); margin-bottom: 24px;"></p>
+      <div style="max-width: 200px; margin: 0 auto;">
+        <a href="index.html" class="btn-primary" style="text-decoration: none; display: block;">Về Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/storage.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

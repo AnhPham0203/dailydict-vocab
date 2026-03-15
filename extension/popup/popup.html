@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { width: 320px; margin: 0; font-family: Inter, -apple-system, sans-serif; background: #fff; color: #111827; }
+    #header { background: #4F46E5; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
+    #header span { color: #fff; font-weight: 600; font-size: 15px; }
+    #today-badge { background: rgba(255,255,255,0.2); color: #fff; font-size: 11px; padding: 2px 10px; border-radius: 20px; font-weight: 500; }
+    .content { padding: 16px; }
+    #stats-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    .stat-box { flex: 1; background: #f9fafb; border: 1px solid #f3f4f6; border-radius: 12px; padding: 10px; text-align: center; }
+    .stat-num { font-size: 18px; font-weight: 700; color: #4F46E5; }
+    .stat-label { font-size: 11px; color: #6b7280; margin-top: 2px; }
+    #last-word { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; margin-bottom: 16px; }
+    .last-word-label { font-size: 11px; color: #9ca3af; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .last-word-word { font-size: 16px; font-weight: 600; color: #111827; }
+    .last-word-vi { font-size: 13px; color: #4F46E5; margin-top: 2px; font-weight: 500; }
+    #empty-state { text-align: center; color: #9ca3af; font-size: 13px; padding: 30px 0; }
+    .btn { width: 100%; border-radius: 10px; padding: 12px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; margin-bottom: 8px; }
+    #btn-review { background: #4F46E5; color: #fff; }
+    #btn-review:hover { background: #4338ca; }
+    #btn-dashboard { background: #fff; color: #4F46E5; border: 1px solid #4F46E5; }
+    #btn-dashboard:hover { background: #f5f3ff; }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <span>📚 DailyDict Vocab</span>
+    <span id="today-badge">0 hôm nay</span>
+  </div>
+
+  <div class="content">
+    <div id="stats-row">
+      <div class="stat-box"><div id="total" class="stat-num">0</div><div class="stat-label">Tổng từ</div></div>
+      <div class="stat-box"><div id="today" class="stat-num">0</div><div class="stat-label">Hôm nay</div></div>
+      <div class="stat-box"><div id="streak" class="stat-num">0🔥</div><div class="stat-label">Streak</div></div>
+    </div>
+
+    <div id="last-word" style="display:none;">
+      <div class="last-word-label">Từ vừa lưu</div>
+      <div class="last-word-word" id="lw-word">perseverance</div>
+      <div class="last-word-vi" id="lw-vi">sự kiên trì</div>
+    </div>
+
+    <div id="empty-state">
+      Bôi đen bất kỳ từ nào<br>trên DailyDictation để bắt đầu ✨
+    </div>
+
+    <button id="btn-review" class="btn">Ôn tập ngay →</button>
+    <button id="btn-dashboard" class="btn">Mở Dashboard</button>
+  </div>
+
+  <script src="../shared/storage.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

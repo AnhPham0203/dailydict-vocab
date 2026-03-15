@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Mode — DailyDict</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="progress-container">
+    <div id="quiz-bar" class="progress-fill" style="width: 0%"></div>
+  </div>
+
+  <div class="app-header">
+    <a href="index.html" class="back-btn">← Dashboard</a>
+    <h1>Multiple Choice</h1>
+    <span id="quiz-progress" style="font-size: 14px; opacity: 0.9;">0 / 0</span>
+  </div>
+
+  <div class="container">
+    <!-- Score streak -->
+    <div class="quiz-streak-row">
+      <span id="quiz-score-display">0 đúng liên tiếp 🔥</span>
+    </div>
+
+    <!-- Question Card -->
+    <div class="quiz-card" id="quiz-card">
+      <div class="quiz-word" id="quiz-word">...</div>
+      <div class="quiz-phonetic" id="quiz-phonetic">...</div>
+    </div>
+
+    <!-- Choices Grid -->
+    <div class="quiz-choices" id="quiz-choices">
+      <!-- Buttons will be injected here -->
+    </div>
+
+    <!-- Result screen -->
+    <div id="quiz-done" class="wp-result">
+      <div class="result-emoji" id="qdone-emoji">🎯</div>
+      <h2 id="qdone-title">Hoàn thành!</h2>
+      <div class="result-score" id="qdone-score">0 / 0 đúng</div>
+      <div class="result-pct" id="qdone-pct">0%</div>
+      <div id="qdone-wrongs" class="result-wrongs"></div>
+      <div class="result-actions">
+        <button class="btn-primary" id="btn-quiz-again">🔄 Chơi lại</button>
+        <a href="review.html" class="btn-secondary" style="text-decoration: none;">🃏 Thử Flashcard</a>
+        <a href="index.html" class="btn-secondary" style="text-decoration: none;">← Về Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/storage.js"></script>
+  <script src="quiz.js"></script>
+</body>
+</html>
