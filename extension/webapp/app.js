@@ -115,24 +115,28 @@ async function initDashboard() {
   const words = await window.DailyDictStorage.getWords()
   const dueToday = await window.DailyDictStorage.getWordsDueToday()
 
-  document.getElementById('stat-streak').textContent = `${stats.streak}🔥`
+  document.getElementById('stat-streak').textContent = stats.streak
   document.getElementById('stat-total').textContent = stats.total
-  document.getElementById('stat-retention').textContent = `${stats.retentionRate}%`
+  document.getElementById('stat-retention').textContent = stats.retentionRate
   document.getElementById('stat-due').textContent = stats.dueCount
 
   renderChart(words)
   renderDueList(dueToday)
 
   const btn = document.getElementById('btn-start-review')
+  const badge = document.getElementById('due-count-badge')
   if (btn) {
-    btn.textContent = `Bắt đầu ôn tập (${dueToday.length} từ)`
+    if (badge) badge.textContent = `${dueToday.length} từ đến hạn`
     btn.addEventListener('click', () => { window.location.href = 'review.html' })
-    if (dueToday.length === 0) btn.disabled = true
+    if (dueToday.length === 0) {
+      btn.disabled = true
+      btn.classList.add('cta-primary--empty')
+    }
   }
 }
 
 function renderChart(words) {
-  const chartWrap = document.getElementById('chart-wrap')
+  const chartWrap = document.getElementById('chart-bars')
   if (!chartWrap) return
   
   const last7Days = []
@@ -157,17 +161,28 @@ function renderDueList(dueWords) {
   const list = document.getElementById('due-list')
   if (!list) return
   if (dueWords.length === 0) {
-    list.innerHTML = `<div class="empty-state" style="padding: 20px 0;"><div class="empty-emoji">🎉</div><p>Không có từ nào cần ôn tập hôm nay!</p></div>`
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state__circle">
+          <span class="empty-state__icon">📖</span>
+        </div>
+        <h3 class="empty-state__title">Chưa có từ nào cần ôn</h3>
+        <p class="empty-state__desc">Mọi từ vựng đã được ôn đúng hạn. Tiếp tục lưu từ mới từ DailyDictation!</p>
+        <a href="https://dailydictation.com" class="empty-state__cta" target="_blank">Đến DailyDictation →</a>
+      </div>`
     return
   }
   const preview = dueWords.slice(0, 5)
   list.innerHTML = preview.map(w => `
-    <div class="word-item">
-      <div class="word-info">
-        <div class="word-title">${w.word} <span class="word-phonetic">${w.phonetic || ''}</span></div>
-        <div class="word-vi">${w.definitionVi || ''}</div>
+    <div class="word-row">
+      <div class="word-row__main">
+        <span class="word-row__word">${w.word}</span>
+        <span class="word-row__phonetic">${w.phonetic || ''}</span>
       </div>
-      <div class="pill ${getPillClass(w.lastRating)}">${getPillLabel(w.lastRating)}</div>
+      <div class="word-row__vi">${w.definitionVi || ''}</div>
+      <div class="word-row__actions">
+        <span class="status-pill ${getPillClass(w.lastRating)}">${getPillLabel(w.lastRating)}</span>
+      </div>
     </div>
   `).join('')
 }
@@ -219,28 +234,33 @@ function renderWordList(words) {
   totalCount.textContent = `${words.length} từ vựng`
   if (words.length === 0) {
     container.innerHTML = ''
-    emptyState.style.display = 'block'
+    emptyState.style.display = 'flex'
     return
   }
   emptyState.style.display = 'none'
   container.innerHTML = words.map(w => `
     <div class="word-row-group" id="group-${w.id}">
-      <div class="word-item word-row" data-id="${w.id}">
-        <div class="word-info">
-          <div class="word-title">${w.word} <span class="word-phonetic">${w.phonetic || ''}</span></div>
-          <div class="word-vi">${w.definitionVi || ''}</div>
+      <div class="word-row" data-id="${w.id}">
+        <div class="word-row__main">
+          <span class="word-row__word">${w.word}</span>
+          <span class="word-row__phonetic">${w.phonetic || ''}</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <div class="pill ${getPillClass(w.lastRating)}">${getPillLabel(w.lastRating)}</div>
-          <button class="btn-delete" data-id="${w.id}" data-word="${w.word}">🗑</button>
+        <div class="word-row__vi">${w.definitionVi || ''}</div>
+        <div class="word-row__actions">
+          <span class="status-pill ${getPillClass(w.lastRating)}">${getPillLabel(w.lastRating)}</span>
+          <button class="delete-btn btn-delete" data-id="${w.id}" data-word="${w.word}" aria-label="Xóa từ này">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 3.5h10M5.5 3.5V2.5h3v1M3.5 3.5l.5 8h6l.5-8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </button>
         </div>
       </div>
       <div class="word-detail" id="detail-${w.id}">
-        <div class="definition-en" style="font-size: 13px; margin-bottom: 8px;">${w.definitionEn || 'Không có định nghĩa tiếng Anh'}</div>
-        <div class="example" style="font-size: 13px;">${w.example ? `"${w.example}"` : 'Không có ví dụ'}</div>
-        <div style="font-size: 11px; color: #9ca3af; margin-top: 10px;">
-          Lưu ngày: ${new Date(w.createdAt).toLocaleDateString('vi-VN')} | 
-          Bài: ${w.sourceUrl ? `<a href="${w.sourceUrl}" target="_blank" class="lesson-link">${w.sourceLesson}</a>` : (w.sourceLesson || 'Không rõ')}
+        <div class="flashcard-en" style="margin-bottom: var(--space-2);">${w.definitionEn || 'Không có định nghĩa tiếng Anh'}</div>
+        <div class="flashcard-example">${w.example ? `"${w.example}"` : 'Không có ví dụ'}</div>
+        <div style="font-size: var(--text-xs); color: var(--c-text-4); margin-top: var(--space-3); display: flex; justify-content: space-between;">
+          <span>Lưu ngày: ${new Date(w.createdAt).toLocaleDateString('vi-VN')}</span>
+          <span>Bài: ${w.sourceUrl ? `<a href="${w.sourceUrl}" target="_blank" class="nav-link" style="display:inline; padding:0; color:var(--c-primary);">${w.sourceLesson}</a>` : (w.sourceLesson || 'Không rõ')}</span>
         </div>
       </div>
     </div>
@@ -249,8 +269,15 @@ function renderWordList(words) {
 
 function toggleDetail(id) {
   const detail = document.getElementById(`detail-${id}`)
-  if (detail) {
-    detail.style.display = (detail.style.display === 'block') ? 'none' : 'block'
+  const group = document.getElementById(`group-${id}`)
+  if (detail && group) {
+    const isExpanded = detail.style.display === 'block'
+    detail.style.display = isExpanded ? 'none' : 'block'
+    if (isExpanded) {
+      group.classList.remove('expanded')
+    } else {
+      group.classList.add('expanded')
+    }
   }
 }
 

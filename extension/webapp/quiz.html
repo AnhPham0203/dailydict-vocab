@@ -3,19 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quiz Mode — DailyDict</title>
+  <title>Quiz Mode — DailyDict Vocab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style>
+    .quiz-streak-row {
+      display: flex;
+      justify-content: center;
+      margin-top: var(--space-4);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-semi);
+      color: var(--c-streak);
+      background: var(--c-streak-bg);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-full);
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .quiz-choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      max-width: 520px;
+      margin: 0 auto var(--space-8);
+      padding: 0 var(--space-5);
+    }
+  </style>
 </head>
 <body>
   <div class="progress-container">
     <div id="quiz-bar" class="progress-fill" style="width: 0%"></div>
   </div>
 
-  <div class="app-header">
-    <a href="index.html" class="back-btn">← Dashboard</a>
-    <h1>Multiple Choice</h1>
-    <span id="quiz-progress" style="font-size: 14px; opacity: 0.9;">0 / 0</span>
-  </div>
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <span class="brand-icon">←</span>
+        <span class="brand-name">Dashboard</span>
+      </a>
+      <h1 style="font-size: var(--text-base); font-weight: var(--weight-semi); color: var(--c-text-1);">Quiz Mode</h1>
+      <span id="quiz-progress" style="font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--c-text-3);">0 / 0</span>
+    </div>
+  </header>
 
   <div class="container">
     <!-- Score streak -->
@@ -36,15 +69,20 @@
 
     <!-- Result screen -->
     <div id="quiz-done" class="wp-result">
-      <div class="result-emoji" id="qdone-emoji">🎯</div>
-      <h2 id="qdone-title">Hoàn thành!</h2>
+      <div class="done-emoji" id="qdone-emoji">🎯</div>
+      <h2 class="empty-state__title" id="qdone-title">Hoàn thành!</h2>
       <div class="result-score" id="qdone-score">0 / 0 đúng</div>
       <div class="result-pct" id="qdone-pct">0%</div>
-      <div id="qdone-wrongs" class="result-wrongs"></div>
-      <div class="result-actions">
-        <button class="btn-primary" id="btn-quiz-again">🔄 Chơi lại</button>
-        <a href="review.html" class="btn-secondary" style="text-decoration: none;">🃏 Thử Flashcard</a>
-        <a href="index.html" class="btn-secondary" style="text-decoration: none;">← Về Dashboard</a>
+      <div id="qdone-wrongs" class="result-wrongs" style="width: 100%; max-width: 480px; margin-top: var(--space-4);"></div>
+      
+      <div class="cta-section" style="width: 100%; max-width: 320px; margin-top: var(--space-4);">
+        <button class="cta-primary" id="btn-quiz-again" style="justify-content: center;">
+          <span class="cta-primary__label">🔄 Chơi lại</span>
+        </button>
+        <div class="cta-secondary-row">
+          <a href="review.html" class="cta-secondary" style="text-decoration: none; justify-content: center;">🃏 Thử Flashcard</a>
+          <a href="index.html" class="cta-secondary" style="text-decoration: none; justify-content: center;">← Dashboard</a>
+        </div>
       </div>
     </div>
   </div>

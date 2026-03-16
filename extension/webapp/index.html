@@ -4,56 +4,86 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard — DailyDict Vocab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app-header">
-    <div style="display: flex; align-items: center; gap: 12px;">
-      <span style="font-size: 24px;">📚</span>
-      <h1>DailyDict Vocab</h1>
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <span class="brand-icon">◆</span>
+        <span class="brand-name">DailyDict Vocab</span>
+      </a>
+      <nav class="header-nav">
+        <a href="words.html" class="nav-link">Từ vựng</a>
+        <a href="review.html" class="nav-link nav-link--cta">Ôn tập</a>
+      </nav>
     </div>
-    <a href="words.html" class="back-btn">Tất cả từ vựng →</a>
-  </div>
+  </header>
 
   <div class="container">
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-      <div class="stat-item">
-        <div id="stat-streak" class="stat-num">0🔥</div>
-        <div class="stat-label">Ngày học</div>
+    <!-- Stats Layout -->
+    <div class="stats-layout">
+      <!-- Stat chính: Streak -->
+      <div class="stat-hero">
+        <div class="stat-hero__icon">🔥</div>
+        <div id="stat-streak" class="stat-hero__number">0</div>
+        <div class="stat-hero__label">ngày liên tiếp</div>
       </div>
-      <div class="stat-item">
-        <div id="stat-total" class="stat-num">0</div>
-        <div class="stat-label">Tổng số từ</div>
-      </div>
-      <div class="stat-item">
-        <div id="stat-retention" class="stat-num">0%</div>
-        <div class="stat-label">Tỷ lệ nhớ</div>
-      </div>
-      <div class="stat-item">
-        <div id="stat-due" class="stat-num">0</div>
-        <div class="stat-label">Cần ôn tập</div>
+
+      <!-- 3 stat phụ -->
+      <div class="stats-grid-3">
+        <div class="stat-item">
+          <div id="stat-total" class="stat-item__number">0</div>
+          <div class="stat-item__label">Tổng số từ</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-item__number"><span id="stat-retention">0</span><span class="stat-item__unit">%</span></div>
+          <div class="stat-item__label">Tỷ lệ nhớ</div>
+        </div>
+        <div class="stat-item">
+          <div id="stat-due" class="stat-item__number">0</div>
+          <div class="stat-item__label">Cần ôn tập</div>
+        </div>
       </div>
     </div>
 
     <!-- Chart Section -->
-    <div class="card-box">
-      <h3 style="font-size: 16px; margin-bottom: 8px;">Từ vựng mới (7 ngày qua)</h3>
-      <div id="chart-wrap" class="chart-wrap">
+    <h2 class="section-heading">Hoạt động 7 ngày qua</h2>
+    <div class="chart-wrap">
+      <div id="chart-bars" class="chart-bars">
         <!-- Bars will be injected here -->
       </div>
     </div>
 
     <!-- Due Words Preview -->
-    <div class="card-box">
-      <h3 style="font-size: 16px; margin-bottom: 16px;">Từ cần ôn tập hôm nay</h3>
-      <div id="due-list">
-        <!-- Words will be injected here -->
-      </div>
-      <div class="cta-grid">
-        <button id="btn-start-review" class="btn-primary">🃏 Flashcard</button>
-        <a href="writing.html" class="btn-secondary" id="btn-start-writing">✍️ Writing</a>
-        <a href="quiz.html" class="btn-secondary" id="btn-start-quiz">🎯 Quiz</a>
+    <h2 class="section-heading">Từ cần ôn tập hôm nay</h2>
+    <div id="due-list" class="word-list">
+      <!-- Words will be injected here -->
+    </div>
+
+    <!-- CTA Section -->
+    <div class="cta-section">
+      <button class="cta-primary" id="btn-start-review">
+        <span class="cta-primary__label">Bắt đầu ôn tập</span>
+        <span class="cta-primary__badge" id="due-count-badge">Flashcard</span>
+      </button>
+
+      <div class="cta-secondary-row">
+        <a href="writing.html" class="cta-secondary" id="btn-start-writing">
+          <span class="cta-icon">✍️</span>
+          <span>Writing</span>
+        </a>
+        <a href="quiz.html" class="cta-secondary" id="btn-start-quiz">
+          <span class="cta-icon">🎯</span>
+          <span>Quiz</span>
+        </a>
+        <a href="words.html" class="cta-secondary">
+          <span class="cta-icon">📚</span>
+          <span>Tất cả từ</span>
+        </a>
       </div>
     </div>
   </div>

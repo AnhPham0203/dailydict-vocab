@@ -4,30 +4,62 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Danh sách từ vựng — DailyDict Vocab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
-    .search-box { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-size: 14px; margin-bottom: 16px; outline: none; transition: border-color 0.2s; }
-    .search-box:focus { border-color: var(--primary); }
-    .controls { display: flex; gap: 12px; margin-bottom: 20px; }
-    .sort-select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: #fff; }
-    .word-detail { display: none; padding: 12px 16px; background: #f9fafb; border-bottom: 1px solid var(--border); }
-    .word-row { cursor: pointer; transition: background 0.1s; }
-    .word-row:hover { background: #f5f3ff; }
-    .btn-delete { color: #ef4444; background: none; border: none; cursor: pointer; padding: 8px; font-size: 16px; opacity: 0.6; transition: opacity 0.2s; }
-    .btn-delete:hover { opacity: 1; }
+    .controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+    .sort-select { 
+      padding: var(--space-2) var(--space-3); 
+      border: 1px solid var(--c-border); 
+      border-radius: var(--radius-md); 
+      font-size: var(--text-sm); 
+      background: var(--c-surface);
+      color: var(--c-text-2);
+      outline: none;
+      font-family: var(--font-main);
+    }
+    .sort-select:focus { border-color: var(--c-primary); }
+    
+    .word-detail { 
+      display: none; 
+      padding: var(--space-4) var(--space-5); 
+      background: var(--c-surface-2); 
+      border-top: 1px solid var(--c-border);
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      margin-top: -1px;
+      margin-bottom: var(--space-3);
+    }
+    
+    .word-row-group { margin-bottom: var(--space-3); }
+    .word-row-group .word-row { border-radius: var(--radius-lg); }
+    .word-row-group.expanded .word-row { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
   </style>
 </head>
 <body>
-  <div class="app-header">
-    <a href="index.html" class="back-btn">← Dashboard</a>
-    <h1 id="total-count">0 từ vựng</h1>
-    <div></div>
-  </div>
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <span class="brand-icon">←</span>
+        <span class="brand-name">Dashboard</span>
+      </a>
+      <h1 id="total-count" style="font-size: var(--text-base); font-weight: var(--weight-semi); color: var(--c-text-1);">0 từ vựng</h1>
+      <div style="width: 80px;"></div> <!-- Spacer to center title if needed -->
+    </div>
+  </header>
 
   <div class="container">
-    <input type="text" id="search-input" class="search-box" placeholder="Tìm kiếm từ vựng hoặc nghĩa...">
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm từ vựng hoặc nghĩa...">
+    </div>
     
     <div class="controls">
+      <h2 class="section-heading" style="margin-bottom: 0;">Bộ sưu tập</h2>
       <select id="sort-select" class="sort-select">
         <option value="newest">Mới nhất</option>
         <option value="oldest">Cũ nhất</option>
@@ -36,15 +68,17 @@
       </select>
     </div>
 
-    <div class="card-box" style="padding: 0; overflow: hidden;">
-      <div id="word-list-container">
-        <!-- Word rows will be injected here -->
-      </div>
+    <div id="word-list-container" class="word-list">
+      <!-- Word rows will be injected here -->
     </div>
 
     <div id="empty-state" class="empty-state" style="display: none;">
-      <div class="empty-emoji">📔</div>
-      <p>Chưa có từ vựng nào. Hãy lưu từ mới trên DailyDictation!</p>
+      <div class="empty-state__circle">
+        <span class="empty-state__icon">📔</span>
+      </div>
+      <h3 class="empty-state__title">Chưa có từ vựng nào</h3>
+      <p class="empty-state__desc">Hãy lưu từ mới từ DailyDictation để bắt đầu hành trình học tập!</p>
+      <a href="https://dailydictation.com" class="empty-state__cta" target="_blank">Đến DailyDictation →</a>
     </div>
   </div>
 

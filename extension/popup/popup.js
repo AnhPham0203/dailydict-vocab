@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 1. Update Stats
   document.getElementById('total').textContent = stats.total
   document.getElementById('today').textContent = stats.todayCount
-  document.getElementById('streak').textContent = `${stats.streak}🔥`
+  document.getElementById('streak').textContent = stats.streak
   document.getElementById('today-badge').textContent = `${stats.todayCount} hôm nay`
 
   // 2. Render Last Word

@@ -3,39 +3,130 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Writing Practice — DailyDict</title>
+  <title>Writing Practice — DailyDict Vocab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style>
+    .wp-audio-btn {
+      background: var(--c-primary-light);
+      color: var(--c-primary);
+      border: none;
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-4);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-semi);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .wp-audio-btn:hover { background: #E0E7FF; transform: translateY(-1px); }
+    
+    .wp-check-btn {
+      background: var(--c-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 0 var(--space-5);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-semi);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .wp-check-btn:hover { background: #4338CA; }
+    
+    .wp-hint-btn {
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-2) var(--space-3);
+      font-size: var(--text-xs);
+      color: var(--c-text-3);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .wp-hint-btn:hover { border-color: var(--c-primary); color: var(--c-primary); }
+
+    .wp-feedback {
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-semi);
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+    }
+    .wp-feedback.correct { background: var(--c-success-bg); color: var(--c-success); }
+    .wp-feedback.wrong { background: var(--c-danger-bg); color: var(--c-danger); }
+    .wp-feedback.hint { background: var(--c-primary-light); color: var(--c-primary); }
+    
+    .wp-result {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--space-12) var(--space-6);
+      text-align: center;
+      gap: var(--space-4);
+    }
+    .result-score { font-size: var(--text-2xl); font-weight: var(--weight-bold); color: var(--c-text-1); }
+    .result-pct { font-size: var(--text-lg); color: var(--c-primary); font-weight: var(--weight-semi); }
+    
+    .wrong-row {
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-4);
+      background: var(--c-danger-bg);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-3);
+      text-align: left;
+      border: 1px solid #FECACA;
+    }
+    .wrong-word { font-weight: var(--weight-bold); color: var(--c-danger); font-size: var(--text-base); }
+    .wrong-vi { font-size: var(--text-sm); color: var(--c-text-3); margin-top: 2px; }
+    .wrong-input { font-size: var(--text-xs); color: var(--c-text-4); font-style: italic; margin-top: var(--space-2); }
+  </style>
 </head>
 <body>
   <div class="progress-container">
     <div id="wp-bar" class="progress-fill" style="width: 0%"></div>
   </div>
 
-  <div class="app-header">
-    <a href="index.html" class="back-btn">← Dashboard</a>
-    <h1>Writing Practice</h1>
-    <span id="wp-progress" style="font-size: 14px; opacity: 0.9;">0 / 0</span>
-  </div>
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <span class="brand-icon">←</span>
+        <span class="brand-name">Dashboard</span>
+      </a>
+      <h1 style="font-size: var(--text-base); font-weight: var(--weight-semi); color: var(--c-text-1);">Writing Practice</h1>
+      <span id="wp-progress" style="font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--c-text-3);">0 / 0</span>
+    </div>
+  </header>
 
   <div class="container">
     <!-- Practice Card -->
     <div class="wp-card" id="wp-card">
       <div class="wp-hint-vi" id="wp-vi">...</div>
-      <div class="wp-hint-en" id="wp-en">...</div>
+      <div class="flashcard-en" id="wp-en" style="text-align: center; max-width: 360px;">...</div>
 
-      <button class="wp-audio-btn" id="wp-audio-btn">🔊 Nghe phát âm</button>
+      <button class="wp-audio-btn" id="wp-audio-btn">
+        <span>🔊</span>
+        <span>Nghe phát âm</span>
+      </button>
 
       <div class="wp-input-wrap">
         <input type="text" id="wp-input"
                placeholder="Gõ từ tiếng Anh..."
                autocomplete="off" autocorrect="off"
                autocapitalize="off" spellcheck="false">
-        <button class="wp-check-btn" id="wp-check-btn">Kiểm tra</button>
+        <button class="wp-check-btn" id="wp-check-btn">Gửi</button>
       </div>
 
       <div id="wp-feedback" class="wp-feedback" style="display:none"></div>
 
-      <div class="wp-hints-row">
+      <div class="wp-hints-row" style="display: flex; gap: var(--space-2);">
         <button class="wp-hint-btn" id="btn-show-phonetic">💡 Xem phonetic</button>
         <button class="wp-hint-btn" id="btn-skip">⏭ Bỏ qua</button>
       </div>
@@ -43,16 +134,20 @@
 
     <!-- Result screen -->
     <div id="wp-result" class="wp-result">
-      <div class="result-emoji" id="result-emoji">🎉</div>
-      <h2 id="result-title">Hoàn thành!</h2>
+      <div class="done-emoji" id="result-emoji">🎉</div>
+      <h2 class="empty-state__title" id="result-title">Hoàn thành!</h2>
       <div class="result-score" id="result-score">0 / 0 đúng</div>
       <div class="result-pct" id="result-pct">0%</div>
 
-      <div id="result-wrongs" class="result-wrongs"></div>
+      <div id="result-wrongs" class="result-wrongs" style="width: 100%; max-width: 480px; margin-top: var(--space-4);"></div>
 
-      <div class="result-actions">
-        <button class="btn-primary" id="btn-retry-wrongs">🔄 Luyện lại từ sai</button>
-        <a href="index.html" class="btn-secondary" style="text-decoration: none;">← Về Dashboard</a>
+      <div class="cta-section" style="width: 100%; max-width: 320px; margin-top: var(--space-4);">
+        <button class="cta-primary" id="btn-retry-wrongs" style="justify-content: center;">
+          <span class="cta-primary__label">🔄 Luyện lại từ sai</span>
+        </button>
+        <a href="index.html" class="cta-secondary" style="text-decoration: none; justify-content: center;">
+          ← Về Dashboard
+        </a>
       </div>
     </div>
   </div>

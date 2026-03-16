@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ôn tập — DailyDict Vocab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,48 +14,67 @@
     <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
   </div>
 
-  <div class="app-header">
-    <a href="index.html" class="back-btn">← Dashboard</a>
-    <h1>Ôn tập hôm nay</h1>
-    <span id="progress-text" style="font-size: 14px; opacity: 0.9;">0 / 0</span>
-  </div>
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <span class="brand-icon">←</span>
+        <span class="brand-name">Dashboard</span>
+      </a>
+      <h1 style="font-size: var(--text-base); font-weight: var(--weight-semi); color: var(--c-text-1);">Ôn tập</h1>
+      <span id="progress-text" style="font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--c-text-3);">0 / 0</span>
+    </div>
+  </header>
 
   <div class="container">
-    <!-- Card -->
+    <!-- Card Container -->
     <div id="card-container" class="card-container">
-      <div id="card" class="card">
+      <div id="card" class="flashcard">
         <!-- Front -->
-        <div id="card-front">
-          <div id="word-text" class="word-display">...</div>
-          <div id="phonetic-text" class="phonetic">...</div>
-          <div class="flip-hint">Nhấn Space hoặc Click để xem nghĩa</div>
+        <div id="card-front" style="width: 100%;">
+          <div id="word-text" class="flashcard-word">...</div>
+          <div id="phonetic-text" class="flashcard-phonetic">...</div>
+          <div class="flashcard-hint">
+            <span>🖱️ Click hoặc ⌨️ Space để xem nghĩa</span>
+          </div>
         </div>
         <!-- Back -->
         <div id="card-back" style="display: none; width: 100%;">
-          <div id="definition-vi" class="definition-vi">...</div>
-          <div id="definition-en" class="definition-en">...</div>
-          <div id="example-text" class="example">...</div>
-          <div id="source-text" class="source">...</div>
+          <div id="definition-vi" class="flashcard-vi">...</div>
+          <div id="definition-en" class="flashcard-en">...</div>
+          <div id="example-text" class="flashcard-example">...</div>
+          <div id="source-text" style="font-size: var(--text-xs); color: var(--c-text-4); margin-top: var(--space-4);">...</div>
         </div>
       </div>
     </div>
 
     <!-- Rating buttons -->
     <div id="rating-row" class="rating-row" style="display: none">
-      <button id="rate-again" class="btn-again">Quên (1)</button>
-      <button id="rate-hard" class="btn-hard">Khó (2)</button>
-      <button id="rate-good" class="btn-good">Nhớ (3)</button>
-      <button id="rate-easy" class="btn-easy">Dễ (4)</button>
+      <button id="rate-again" class="rating-btn rating-again" data-rating="again">
+        <span class="rating-btn__label">Quên (1)</span>
+        <span class="rating-btn__sublabel">+1 ngày</span>
+      </button>
+      <button id="rate-hard" class="rating-btn rating-hard" data-rating="hard">
+        <span class="rating-btn__label">Khó (2)</span>
+        <span class="rating-btn__sublabel">×1.2</span>
+      </button>
+      <button id="rate-good" class="rating-btn rating-good" data-rating="good">
+        <span class="rating-btn__label">Nhớ (3)</span>
+        <span class="rating-btn__sublabel">×2.5</span>
+      </button>
+      <button id="rate-easy" class="rating-btn rating-easy" data-rating="easy">
+        <span class="rating-btn__label">Dễ (4)</span>
+        <span class="rating-btn__sublabel">×3.2</span>
+      </button>
     </div>
 
     <!-- Done screen -->
-    <div id="done-screen" class="done-screen" style="display: none">
+    <div id="done-screen" class="done-screen">
       <div class="done-emoji">🎉</div>
-      <h2>Tuyệt vời!</h2>
-      <p id="done-text" style="color: var(--text-muted); margin-bottom: 24px;"></p>
-      <div style="max-width: 200px; margin: 0 auto;">
-        <a href="index.html" class="btn-primary" style="text-decoration: none; display: block;">Về Dashboard</a>
-      </div>
+      <h2 class="empty-state__title">Tuyệt vời!</h2>
+      <p id="done-text" class="empty-state__desc" style="margin-bottom: var(--space-6);"></p>
+      <a href="index.html" class="cta-primary" style="text-decoration: none; justify-content: center; max-width: 240px; margin: 0 auto;">
+        Về Dashboard
+      </a>
     </div>
   </div>
 
