@@ -46,16 +46,14 @@ async function renderTagList() {
   }
 
   list.innerHTML = tags.map(tag => `
-    <div class="tag-row" data-id="${tag.id}">
-      <div class="tag-row__left">
-        <span class="tag-dot" style="background:${tag.color}"></span>
-        <span class="tag-row__name">${tag.name}</span>
-        <span class="tag-row__count">${tag.count} từ</span>
-      </div>
-      <div class="tag-row__actions">
-        <a href="words.html?tag=${encodeURIComponent(tag.name)}" class="tag-row__btn">Xem từ</a>
-        <button class="tag-row__btn btn-edit-tag" data-id="${tag.id}" data-name="${tag.name}" data-color="${tag.color}">Sửa</button>
-        <button class="tag-row__btn tag-row__btn--delete btn-delete-tag" data-id="${tag.id}" data-name="${tag.name}">Xoá</button>
+    <div class="tag-item" data-id="${tag.id}">
+      <div class="tag-item__dot" style="background:${tag.color}"></div>
+      <div class="tag-item__name">${tag.name}</div>
+      <div class="tag-item__count">${tag.count} từ</div>
+      <div class="tag-item__actions">
+        <a href="words.html?tag=${encodeURIComponent(tag.name)}" class="tag-item__btn">Xem từ</a>
+        <button class="tag-item__btn btn-edit-tag" data-id="${tag.id}" data-name="${tag.name}" data-color="${tag.color}">Sửa</button>
+        <button class="tag-item__btn tag-item__btn--danger btn-delete-tag" data-id="${tag.id}" data-name="${tag.name}">Xoá</button>
       </div>
     </div>
   `).join('')

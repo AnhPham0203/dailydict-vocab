@@ -158,7 +158,8 @@ function parseCSV(text) {
 
 function showImportResult(type, msg) {
   const el = document.getElementById('import-result')
-  el.style.display = 'block'; el.className = `import-result import-result--${type}`
+  el.style.display = 'block'; 
+  el.className = `import-result import-result--${type}`
   el.textContent = (type === 'success' ? '✅ ' : '❌ ') + msg
 }
 
