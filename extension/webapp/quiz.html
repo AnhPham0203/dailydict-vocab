@@ -33,7 +33,7 @@
       padding: 0 var(--space-5);
     }
 
-    /* Result styles (copied from writing.html for consistency) */
+    /* Result styles */
     .wp-result {
       display: none;
       flex-direction: column;
@@ -76,37 +76,99 @@
   </header>
 
   <div class="container">
-    <!-- Score streak -->
-    <div class="quiz-streak-row">
-      <span id="quiz-score-display">0 đúng liên tiếp 🔥</span>
+    <!-- SETUP SCREEN — hiện mặc định, ẩn khi bắt đầu -->
+    <div id="quiz-setup" class="setup-screen">
+      <h2 class="setup-screen__title">⚙️ Chọn bộ từ để luyện</h2>
+
+      <!-- Chọn nguồn từ -->
+      <div class="setup-group">
+        <label class="setup-label">Nguồn từ</label>
+        <div class="setup-chips" id="setup-source-chips">
+          <button class="setup-chip setup-chip--active" data-source="due">📅 Đến hạn hôm nay</button>
+          <button class="setup-chip" data-source="all">📚 Tất cả từ</button>
+          <button class="setup-chip" data-source="lesson">🎧 Theo bài học</button>
+          <button class="setup-chip" data-source="tag">🏷️ Theo tag</button>
+        </div>
+      </div>
+
+      <!-- Dropdown bài học — chỉ hiện khi chọn "Theo bài học" -->
+      <div class="setup-group" id="setup-lesson-group" style="display:none">
+        <label class="setup-label">Chọn bài</label>
+        <select class="setup-select" id="setup-lesson-select">
+          <option value="">-- Chọn bài học --</option>
+        </select>
+      </div>
+
+      <!-- Dropdown tag — chỉ hiện khi chọn "Theo tag" -->
+      <div class="setup-group" id="setup-tag-group" style="display:none">
+        <label class="setup-label">Chọn tag</label>
+        <select class="setup-select" id="setup-tag-select">
+          <option value="">-- Chọn tag --</option>
+        </select>
+      </div>
+
+      <!-- Số từ mỗi session -->
+      <div class="setup-group">
+        <label class="setup-label">Số từ mỗi lượt</label>
+        <div class="setup-chips" id="setup-size-chips">
+          <button class="setup-chip" data-size="10">10 từ</button>
+          <button class="setup-chip setup-chip--active" data-size="20">20 từ</button>
+          <button class="setup-chip" data-size="30">30 từ</button>
+          <button class="setup-chip" data-size="0">Tất cả</button>
+        </div>
+      </div>
+
+      <!-- Preview số từ tìm được -->
+      <div class="setup-preview" id="setup-preview">
+        <span id="setup-preview-count">--</span> từ khớp với bộ lọc
+      </div>
+
+      <!-- Nút bắt đầu -->
+      <button class="cta-primary" id="btn-start-quiz" style="justify-content:center;" disabled>
+        <span class="cta-primary__label">Bắt đầu Quiz →</span>
+      </button>
     </div>
 
-    <!-- Question Card -->
-    <div class="quiz-card" id="quiz-card">
-      <div class="quiz-word" id="quiz-word">...</div>
-      <div class="quiz-phonetic" id="quiz-phonetic">...</div>
-    </div>
+    <!-- Phần quiz hiện tại — ẩn mặc định -->
+    <div id="quiz-game" style="display:none">
+      <!-- Score streak -->
+      <div class="quiz-streak-row">
+        <span id="quiz-score-display">0 đúng liên tiếp 🔥</span>
+      </div>
 
-    <!-- Choices Grid -->
-    <div class="quiz-choices" id="quiz-choices">
-      <!-- Buttons will be injected here -->
-    </div>
+      <!-- Question Card -->
+      <div class="quiz-card" id="quiz-card">
+        <div class="quiz-word" id="quiz-word">...</div>
+        <div class="quiz-phonetic" id="quiz-phonetic">...</div>
+      </div>
 
-    <!-- Result screen -->
-    <div id="quiz-done" class="wp-result">
-      <div class="done-emoji" id="qdone-emoji">🎯</div>
-      <h2 class="empty-state__title" id="qdone-title">Hoàn thành!</h2>
-      <div class="result-score" id="qdone-score">0 / 0 đúng</div>
-      <div class="result-pct" id="qdone-pct">0%</div>
-      <div id="qdone-wrongs" class="result-wrongs" style="width: 100%; max-width: 480px; margin-top: var(--space-4);"></div>
-      
-      <div class="cta-section" style="width: 100%; max-width: 320px; margin-top: var(--space-4);">
-        <button class="cta-primary" id="btn-quiz-again" style="justify-content: center;">
-          <span class="cta-primary__label">🔄 Chơi lại</span>
-        </button>
-        <div class="cta-secondary-row">
-          <a href="review.html" class="cta-secondary" style="text-decoration: none; justify-content: center;">🃏 Thử Flashcard</a>
-          <a href="index.html" class="cta-secondary" style="text-decoration: none; justify-content: center;">← Dashboard</a>
+      <!-- Choices Grid -->
+      <div class="quiz-choices" id="quiz-choices">
+        <!-- Buttons will be injected here -->
+      </div>
+
+      <!-- Result screen -->
+      <div id="quiz-done" class="wp-result">
+        <div class="done-emoji" id="qdone-emoji">🎯</div>
+        <h2 class="empty-state__title" id="qdone-title">Hoàn thành!</h2>
+        <div class="result-score" id="qdone-score">0 / 0 đúng</div>
+        <div class="result-pct" id="qdone-pct">0%</div>
+        <div id="qdone-wrongs" class="result-wrongs" style="width: 100%; max-width: 480px; margin-top: var(--space-4);"></div>
+        
+        <div class="cta-section" style="width: 100%; max-width: 320px; margin-top: var(--space-4);">
+          <!-- Continue Button (v1.3) -->
+          <button class="cta-primary" id="btn-continue-quiz" style="display:none; justify-content:center; margin-bottom: 8px; background: var(--c-success);">
+            <span class="cta-primary__label">Luyện tiếp →</span>
+            <span class="cta-primary__badge" id="btn-continue-count"></span>
+          </button>
+
+          <button class="cta-primary" id="btn-quiz-again" style="justify-content:center;">
+            <span class="cta-primary__label">🔄 Chọn bộ từ khác</span>
+          </button>
+          <div class="cta-secondary-row">
+            <a href="review.html" class="cta-secondary" style="text-decoration: none; justify-content: center;">🃏 Thử Flashcard</a>
+            <a href="index.html" class="cta-secondary" style="text-decoration: none; justify-content: center;">← Dashboard</a>
+          </div>
         </div>
       </div>
     </div>

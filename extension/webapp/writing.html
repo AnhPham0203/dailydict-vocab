@@ -106,49 +106,111 @@
   </header>
 
   <div class="container">
-    <!-- Practice Card -->
-    <div class="wp-card" id="wp-card">
-      <div class="wp-hint-vi" id="wp-vi">...</div>
-      <div class="flashcard-en" id="wp-en" style="display:none; text-align:center; max-width:360px;">...</div>
+    <!-- SETUP SCREEN — hiện mặc định, ẩn khi bắt đầu -->
+    <div id="writing-setup" class="setup-screen">
+      <h2 class="setup-screen__title">⚙️ Chọn bộ từ để luyện</h2>
 
-      <button class="wp-audio-btn" id="wp-audio-btn">
-        <span>🔊</span>
-        <span>Nghe phát âm</span>
+      <!-- Chọn nguồn từ -->
+      <div class="setup-group">
+        <label class="setup-label">Nguồn từ</label>
+        <div class="setup-chips" id="setup-source-chips">
+          <button class="setup-chip setup-chip--active" data-source="due">📅 Đến hạn hôm nay</button>
+          <button class="setup-chip" data-source="all">📚 Tất cả từ</button>
+          <button class="setup-chip" data-source="lesson">🎧 Theo bài học</button>
+          <button class="setup-chip" data-source="tag">🏷️ Theo tag</button>
+        </div>
+      </div>
+
+      <!-- Dropdown bài học — chỉ hiện khi chọn "Theo bài học" -->
+      <div class="setup-group" id="setup-lesson-group" style="display:none">
+        <label class="setup-label">Chọn bài</label>
+        <select class="setup-select" id="setup-lesson-select">
+          <option value="">-- Chọn bài học --</option>
+        </select>
+      </div>
+
+      <!-- Dropdown tag — chỉ hiện khi chọn "Theo tag" -->
+      <div class="setup-group" id="setup-tag-group" style="display:none">
+        <label class="setup-label">Chọn tag</label>
+        <select class="setup-select" id="setup-tag-select">
+          <option value="">-- Chọn tag --</option>
+        </select>
+      </div>
+
+      <!-- Số từ mỗi session -->
+      <div class="setup-group">
+        <label class="setup-label">Số từ mỗi lượt</label>
+        <div class="setup-chips" id="setup-size-chips">
+          <button class="setup-chip" data-size="10">10 từ</button>
+          <button class="setup-chip setup-chip--active" data-size="20">20 từ</button>
+          <button class="setup-chip" data-size="30">30 từ</button>
+          <button class="setup-chip" data-size="0">Tất cả</button>
+        </div>
+      </div>
+
+      <!-- Preview số từ tìm được -->
+      <div class="setup-preview" id="setup-preview">
+        <span id="setup-preview-count">--</span> từ khớp với bộ lọc
+      </div>
+
+      <!-- Nút bắt đầu -->
+      <button class="cta-primary" id="btn-start-writing" style="justify-content:center;" disabled>
+        <span class="cta-primary__label">Bắt đầu Writing →</span>
       </button>
-
-      <div class="wp-input-wrap">
-        <input type="text" id="wp-input"
-               placeholder="Gõ từ tiếng Anh..."
-               autocomplete="off" autocorrect="off"
-               autocapitalize="off" spellcheck="false">
-        <button class="wp-check-btn" id="wp-check-btn">Gửi</button>
-      </div>
-
-      <div id="wp-feedback" class="wp-feedback" style="display:none"></div>
-
-      <div class="wp-hints-row" style="display: flex; gap: var(--space-2);">
-        <button class="wp-hint-btn" id="btn-show-phonetic">💡 Xem phonetic</button>
-        <button class="wp-hint-btn" id="btn-show-en">📖 Xem định nghĩa EN</button>
-        <button class="wp-hint-btn" id="btn-skip">⏭ Bỏ qua</button>
-      </div>
     </div>
 
-    <!-- Result screen -->
-    <div id="wp-result" class="wp-result">
-      <div class="done-emoji" id="result-emoji">🎉</div>
-      <h2 class="empty-state__title" id="result-title">Hoàn thành!</h2>
-      <div class="result-score" id="result-score">0 / 0 đúng</div>
-      <div class="result-pct" id="result-pct">0%</div>
+    <!-- Phần game — ẩn mặc định -->
+    <div id="writing-game" style="display:none">
+      <!-- Practice Card -->
+      <div class="wp-card" id="wp-card">
+        <div class="wp-hint-vi" id="wp-vi">...</div>
+        <div class="flashcard-en" id="wp-en" style="display:none; text-align:center; max-width:360px;">...</div>
 
-      <div id="result-wrongs" class="result-wrongs" style="width: 100%; max-width: 480px; margin-top: var(--space-4);"></div>
-
-      <div class="cta-section" style="width: 100%; max-width: 320px; margin-top: var(--space-4);">
-        <button class="cta-primary" id="btn-retry-wrongs" style="justify-content: center;">
-          <span class="cta-primary__label">🔄 Luyện lại từ sai</span>
+        <button class="wp-audio-btn" id="wp-audio-btn">
+          <span>🔊</span>
+          <span>Nghe phát âm</span>
         </button>
-        <a href="index.html" class="cta-secondary" style="text-decoration: none; justify-content: center;">
-          ← Về Dashboard
-        </a>
+
+        <div class="wp-input-wrap">
+          <input type="text" id="wp-input"
+                 placeholder="Gõ từ tiếng Anh..."
+                 autocomplete="off" autocorrect="off"
+                 autocapitalize="off" spellcheck="false">
+          <button class="wp-check-btn" id="wp-check-btn">Gửi</button>
+        </div>
+
+        <div id="wp-feedback" class="wp-feedback" style="display:none"></div>
+
+        <div class="wp-hints-row" style="display: flex; gap: var(--space-2);">
+          <button class="wp-hint-btn" id="btn-show-phonetic">💡 Xem phonetic</button>
+          <button class="wp-hint-btn" id="btn-show-en">📖 Xem định nghĩa EN</button>
+          <button class="wp-hint-btn" id="btn-skip">⏭ Bỏ qua</button>
+        </div>
+      </div>
+
+      <!-- Result screen -->
+      <div id="wp-result" class="wp-result">
+        <div class="done-emoji" id="result-emoji">🎉</div>
+        <h2 class="empty-state__title" id="result-title">Hoàn thành!</h2>
+        <div class="result-score" id="result-score">0 / 0 đúng</div>
+        <div class="result-pct" id="result-pct">0%</div>
+
+        <div id="result-wrongs" class="result-wrongs" style="width: 100%; max-width: 480px; margin-top: var(--space-4);"></div>
+
+        <div class="cta-section" style="width: 100%; max-width: 320px; margin-top: var(--space-4);">
+          <!-- Continue Button (v1.3) -->
+          <button class="cta-primary" id="btn-continue-writing" style="display:none; justify-content:center; margin-bottom: 8px; background: var(--c-success);">
+            <span class="cta-primary__label">Luyện tiếp →</span>
+            <span class="cta-primary__badge" id="btn-continue-count"></span>
+          </button>
+
+          <button class="cta-primary" id="btn-retry-wrongs" style="justify-content:center;">
+            <span class="cta-primary__label">🔄 Chọn bộ từ khác</span>
+          </button>
+          <a href="index.html" class="cta-secondary" style="text-decoration: none; justify-content: center;">
+            ← Về Dashboard
+          </a>
+        </div>
       </div>
     </div>
   </div>
