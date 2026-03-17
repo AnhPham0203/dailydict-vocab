@@ -215,6 +215,21 @@ function buildLoadingHTML(word) {
 }
 
 function buildTooltipHTML(word, data) {
+  // TASK-05: Map từ loại EN → VI
+  const POS_MAP = {
+    'noun': 'danh từ',
+    'verb': 'động từ',
+    'adjective': 'tính từ',
+    'adverb': 'trạng từ',
+    'pronoun': 'đại từ',
+    'preposition': 'giới từ',
+    'conjunction': 'liên từ',
+    'interjection': 'thán từ',
+    'article': 'mạo từ',
+    'exclamation': 'thán từ',
+    'abbreviation': 'viết tắt',
+  }
+
   const phonetic = data?.phonetic ? `<span class="dd-phonetic">${data.phonetic}</span>` : ''
   const viMain   = data?.definitionViMain ? `<div class="dd-vi">${data.definitionViMain}</div>` : ''
   
@@ -222,14 +237,18 @@ function buildTooltipHTML(word, data) {
   if (data?.definitionViDict) {
     viDict = `<div class="dd-dict" style="font-size: 12px; color: #78716C; margin-top: 4px;">` + 
       data.definitionViDict.map(item => 
-        `<div style="margin-bottom: 2px;"><i>${item.pos}:</i> ${item.terms.join(', ')}</div>`
+        `<div style="margin-bottom: 2px;"><i>${POS_MAP[item.pos] || item.pos}:</i> ${item.terms.slice(0, 3).join(', ')}</div>`
       ).join('') + 
       `</div>`
   }
 
   const noData = (!viMain && !viDict) ? `<div class="dd-no-data">Không tìm được nghĩa 😕</div>` : ''
   const lesson = document.querySelector('h1')?.textContent?.trim() || ''
-  const ctx    = lesson ? `<span class="dd-context" title="${lesson}">📌 ${lesson.slice(0,38)}...</span>` : '<span></span>'
+  
+  // TASK-02: Thêm hint phím tắt vào footer
+  const ctx = lesson
+    ? `<span class="dd-context" title="${lesson}">📌 ${lesson.slice(0,38)}...</span>`
+    : `<span class="dd-context">Ctrl để nghe phát âm</span>`
 
   return `
     <div class="dd-header"><span class="dd-word">${word}</span>${phonetic}</div>
@@ -249,3 +268,31 @@ function hideTooltipDelayed(delay = 400) {
     }
   }, delay)
 }
+
+// ── TASK-02: TTS: Phát âm bằng Left Ctrl khi tooltip đang hiện ──
+document.addEventListener('keydown', (e) => {
+  // Left Ctrl: e.key === 'Control' && e.location === 1
+  if (e.key === 'Control' && e.location === 1) {
+    const tip = document.getElementById('dd-tooltip')
+    if (!tip || !tip.classList.contains('dd-visible')) return
+
+    // Lấy từ đang hiện trong tooltip
+    const wordEl = tip.querySelector('.dd-word')
+    if (!wordEl) return
+
+    const word = wordEl.textContent.trim()
+    if (!word) return
+
+    e.preventDefault()
+    const utter = new SpeechSynthesisUtterance(word)
+    utter.lang = 'en-US'
+    utter.rate = 0.85
+    window.speechSynthesis.cancel() // dừng nếu đang đọc cái khác
+    window.speechSynthesis.speak(utter)
+  }
+
+  // Escape: ẩn tooltip
+  if (e.key === 'Escape') {
+    hideTooltipDelayed(0)
+  }
+})

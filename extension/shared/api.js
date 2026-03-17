@@ -64,9 +64,11 @@ window.DailyDictAPI = {
       const mainTranslation = json?.[0]?.[0]?.[0]
       if (!mainTranslation) return null
 
+      const isPhrase = word.includes(' ')
+
       // json[1] is the dictionary part (pos and alternative terms)
       let dictionary = []
-      if (json?.[1]) {
+      if (json?.[1] && !isPhrase) {
         dictionary = json[1].map(item => ({
           pos: item[0], // part of speech (e.g., "noun", "verb")
           terms: item[1] // array of terms

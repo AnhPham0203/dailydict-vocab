@@ -49,8 +49,6 @@ function detectWordAtCursor(x, y) {
   const node = range.startContainer
   if (node.nodeType !== Node.TEXT_NODE) return
 
-  if (VN_REGEX.test(node.textContent)) return
-
   const wordRange = getFullWordRange(node, range.startOffset)
   if (!wordRange) return
 
@@ -60,6 +58,14 @@ function detectWordAtCursor(x, y) {
   if (fullWord.length < 2 || fullWord.length > 40) return
 
   if (fullWord === lastWord) return
+
+  // TASK-03: Bỏ qua nếu là phần của URL (node cha là thẻ <a>)
+  if (wordRange.startContainer.parentElement?.closest('a')) return
+
+  // TASK-03: Bỏ qua các từ kỹ thuật không có nghĩa học: http, www, com, org...
+  const SKIP_WORDS = new Set(['http', 'https', 'www', 'com', 'org', 'net', 'html', 'css', 'js'])
+  if (SKIP_WORDS.has(fullWord.toLowerCase())) return
+
   lastWord = fullWord
   
   const rect = wordRange.getBoundingClientRect()
@@ -96,13 +102,10 @@ document.addEventListener('mouseup', (e) => {
 
   const selection = window.getSelection()
   const selected = selection.toString().trim()
-  if (!selected || selected.length > 60) return
-
-  const node = selection.anchorNode
-  if (node && VN_REGEX.test(node.textContent)) return // Bỏ qua nếu ngữ cảnh là tiếng Việt
+  if (!selected || selected.length > 80) return // TASK-04: Allow phrases up to 80 chars
 
   if (!/^[a-zA-Z\s'-]+$/.test(selected)) return
-  if (VN_REGEX.test(selected)) return
+  if (VN_REGEX.test(selected)) return // Keep checking the selected text itself
 
   lastWord = selected
   showTooltip(selected, selection.getRangeAt(0).getBoundingClientRect())
