@@ -42,22 +42,112 @@ async function showTooltip(word, anchorRect) {
         sourceUrl: window.location.href
       })
 
-      btn.textContent = result.success ? '✓ Đã lưu' : 'Đã có rồi'
-      btn.classList.toggle('saved', result.success)
-      
-      // v1.2: Milestone celebration & Badges
       if (result.success) {
+        // v1.3: Show Tag input state
+        showSavedState(result.word.id, word)
+        
+        // v1.2: Milestone celebration & Badges
         if (result.milestoneReached) {
           showTooltipNotification(`🔥 Streak ${result.milestoneReached} ngày! Tuyệt vời!`)
         }
         if (result.newBadges && result.newBadges.length > 0) {
           showTooltipNotification(`🏆 Đã mở khóa ${result.newBadges.length} huy hiệu mới!`)
         }
+      } else {
+        btn.textContent = 'Đã có rồi'
+        btn.classList.add('saved')
       }
     })
   } catch (err) {
     if (tip) tip.innerHTML = `<div class="dd-error">Lỗi khi tải dữ liệu</div>`
   }
+}
+
+async function showSavedState(wordId, word) {
+  const tip = document.getElementById('dd-tooltip')
+  if (!tip) return
+
+  const wordData = await window.DailyDictStorage.getWordById(wordId)
+  const existingTags = wordData?.tags || []
+
+  tip.innerHTML = `
+    <div class="dd-saved-confirm">✓ Đã lưu — <strong>${word}</strong></div>
+    <div class="dd-tag-section">
+      <div class="dd-tags-wrap" id="dd-tags-wrap">
+        ${existingTags.map(t => `
+          <span class="dd-tag-pill" data-tag="${t}">
+            ${t}
+            <button class="dd-tag-remove" data-tag="${t}" data-word="${wordId}">×</button>
+          </span>`).join('')}
+      </div>
+      <div style="position:relative">
+        <input type="text" id="dd-tag-input"
+               class="dd-tag-input"
+               placeholder="+ Thêm tag (vd: IELTS, Bài 14)..."
+               autocomplete="off" maxlength="30">
+        <div class="dd-tag-suggestions" id="dd-tag-sugg" style="display:none"></div>
+      </div>
+    </div>`
+
+  const input = document.getElementById('dd-tag-input')
+  const sugg = document.getElementById('dd-tag-sugg')
+
+  input.focus()
+
+  input.addEventListener('input', async () => {
+    const q = input.value.trim().toLowerCase()
+    if (!q) { sugg.style.display = 'none'; return }
+
+    const tags = await window.DailyDictStorage.getTagsWithCount()
+    const matches = tags.filter(t => t.name.toLowerCase().includes(q))
+
+    if (matches.length === 0) { sugg.style.display = 'none'; return }
+
+    sugg.innerHTML = matches.slice(0, 5).map(t =>
+      `<div class="dd-sugg-item" data-name="${t.name}">${t.name}
+       <span class="dd-sugg-count">${t.count}</span></div>`
+    ).join('')
+    sugg.style.display = 'block'
+  })
+
+  input.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      const val = input.value.trim()
+      if (!val) return
+      await window.DailyDictStorage.addTagToWord(wordId, val)
+      input.value = ''
+      sugg.style.display = 'none'
+      refreshTagsDisplay(wordId)
+    }
+  })
+
+  sugg.addEventListener('click', async (e) => {
+    const item = e.target.closest('.dd-sugg-item')
+    if (!item) return
+    await window.DailyDictStorage.addTagToWord(wordId, item.dataset.name)
+    input.value = ''
+    sugg.style.display = 'none'
+    refreshTagsDisplay(wordId)
+  })
+
+  tip.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.dd-tag-remove')
+    if (!btn) return
+    await window.DailyDictStorage.removeTagFromWord(btn.dataset.word, btn.dataset.tag)
+    refreshTagsDisplay(wordId)
+  })
+}
+
+async function refreshTagsDisplay(wordId) {
+  const word = await window.DailyDictStorage.getWordById(wordId)
+  const wrap = document.getElementById('dd-tags-wrap')
+  if (!wrap || !word) return
+  wrap.innerHTML = (word.tags || []).map(t => `
+    <span class="dd-tag-pill" data-tag="${t}">
+      ${t}
+      <button class="dd-tag-remove" data-tag="${t}" data-word="${wordId}">×</button>
+    </span>`).join('')
 }
 
 function showTooltipNotification(text) {
@@ -99,7 +189,7 @@ function showTooltipNotification(text) {
 // ── Định vị tooltip thông minh ──
 function positionTooltip(tip, rect) {
   const TIP_W  = 284
-  const TIP_H  = 180  // ước lượng
+  const TIP_H  = 220  // Increased for tags
   const OFFSET = 12
 
   let left = rect.left + window.scrollX
@@ -149,6 +239,5 @@ function hideTooltipDelayed(delay = 400) {
         if (!tip.classList.contains('dd-visible')) tip.remove()
       }, 200)
     }
-    lastWord = ''
   }, delay)
 }

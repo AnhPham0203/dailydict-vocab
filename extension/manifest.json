@@ -8,6 +8,8 @@
   "content_scripts": [{
     "matches": ["https://dailydictation.com/*"],
     "js": [
+      "shared/badges.js",
+      "shared/tags.js",
       "shared/storage.js",
       "shared/api.js",
       "content/tooltip.js",

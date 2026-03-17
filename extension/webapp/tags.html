@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý Tags — DailyDict Vocab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .tag-header-actions { display: flex; gap: var(--space-2); }
+    .btn-sm-primary {
+      background: var(--c-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-4);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-semi);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-sm-primary:hover { background: #4338CA; transform: translateY(-1px); }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <span class="brand-icon">←</span>
+        <span class="brand-name">Dashboard</span>
+      </a>
+      <h1 style="font-size: var(--text-base); font-weight: var(--weight-semi); color: var(--c-text-1);">Quản lý Tags</h1>
+      <div class="tag-header-actions">
+        <button class="btn-sm-primary" id="btn-create-tag">+ Tạo tag</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Create/Edit tag form (hidden by default) -->
+    <div id="tag-form-container" class="tag-form" style="display:none">
+      <h2 class="section-heading" id="form-title" style="margin-bottom: var(--space-3); border:none; padding:0;">Tạo tag mới</h2>
+      <input type="text" id="tag-name-input"
+             placeholder="Tên tag (vd: IELTS, Academic...)"
+             class="tag-form__input" maxlength="30">
+      <div class="tag-form__colors" id="color-picker">
+        <!-- Colors will be injected here -->
+      </div>
+      <div class="tag-form__actions">
+        <button class="btn-sm-primary" id="btn-save-tag">Lưu tag</button>
+        <button class="cta-secondary" style="padding: var(--space-2) var(--space-4); font-size: var(--text-sm);" id="btn-cancel-tag">Huỷ</button>
+      </div>
+    </div>
+
+    <!-- Tag list -->
+    <div class="tag-list" id="tag-list">
+      <!-- render bằng JS -->
+    </div>
+  </div>
+
+  <script src="../shared/tags.js"></script>
+  <script src="../shared/storage.js"></script>
+  <script src="tags.js"></script>
+</body>
+</html>

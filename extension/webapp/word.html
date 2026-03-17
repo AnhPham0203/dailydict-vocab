@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết từ vựng — DailyDict Vocab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .word-hero { text-align: center; padding: var(--space-8) 0; }
+    .word-hero__word { font-size: var(--text-4xl); font-weight: 800; color: var(--c-text-1); letter-spacing: -0.03em; margin-bottom: var(--space-2); }
+    .word-hero__phonetic { font-size: var(--text-lg); color: var(--c-text-4); font-style: italic; margin-bottom: var(--space-4); }
+    .word-hero__audio {
+      background: var(--c-primary-light); color: var(--c-primary); border: none; border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-4); font-size: var(--text-sm); font-weight: 600; cursor: pointer; transition: all 0.15s;
+    }
+    .word-hero__audio:hover { background: #E0E7FF; transform: translateY(-1px); }
+
+    .detail-section { margin-bottom: var(--space-8); }
+    .definition-card, .example-card {
+      background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-xl); padding: var(--space-6);
+    }
+    .def-vi { font-size: var(--text-xl); font-weight: 700; color: var(--c-primary); margin-bottom: var(--space-2); }
+    .def-en { font-size: var(--text-base); color: var(--c-text-2); line-height: 1.6; }
+    .example-card { font-style: italic; color: var(--c-text-2); line-height: 1.6; border-left: 4px solid var(--c-primary-light); }
+
+    .srs-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+    .srs-stat {
+      background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-lg);
+      padding: var(--space-4); text-align: center;
+    }
+    .srs-stat__num { display: block; font-size: var(--text-xl); font-weight: 700; color: var(--c-text-1); margin-bottom: 2px; }
+    .srs-stat__label { font-size: var(--text-xs); color: var(--c-text-4); text-transform: uppercase; font-weight: 600; }
+
+    .detail-tags { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-4); }
+    .detail-tag-pill {
+      display: inline-flex; align-items: center; gap: 6px; background: #F5F5F4; color: #44403C;
+      font-size: var(--text-sm); font-weight: 600; padding: 4px 12px; border-radius: 99px; border: 1px solid var(--c-border);
+    }
+    .detail-tag-remove { background: none; border: none; cursor: pointer; color: var(--c-text-4); font-size: 16px; padding: 0; }
+    .detail-tag-remove:hover { color: var(--c-danger); }
+
+    .tag-input-inline {
+      width: 100%; max-width: 300px; padding: 8px 12px; border: 1.5px solid var(--c-border); border-radius: var(--radius-md);
+      font-size: var(--text-sm); font-family: inherit; outline: none;
+    }
+    .tag-input-inline:focus { border-color: var(--c-primary); }
+
+    .source-link {
+      display: inline-block; color: var(--c-primary); text-decoration: none; font-weight: 600;
+      padding: var(--space-3) var(--space-4); background: var(--c-primary-light); border-radius: var(--radius-md);
+    }
+    .source-link:hover { text-decoration: underline; background: #E0E7FF; }
+
+    .btn-icon--danger {
+      background: none; border: none; cursor: pointer; font-size: 20px; color: var(--c-text-4); transition: color 0.15s;
+    }
+    .btn-icon--danger:hover { color: var(--c-danger); }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="words.html" class="header-brand">
+        <span class="brand-icon">←</span>
+        <span class="brand-name">Tất cả từ</span>
+      </a>
+      <span class="header-title" id="detail-word-title" style="font-weight: 700; color: var(--c-text-1);">...</span>
+      <button class="btn-icon--danger" id="btn-delete-word" title="Xoá từ này">🗑</button>
+    </div>
+  </header>
+
+  <div class="container" style="max-width: 600px;">
+    <div class="word-hero">
+      <h1 class="word-hero__word" id="detail-word">...</h1>
+      <div class="word-hero__phonetic" id="detail-phonetic">...</div>
+      <button class="word-hero__audio" id="btn-play-audio">🔊 Nghe phát âm</button>
+    </div>
+
+    <div class="detail-section">
+      <h2 class="section-heading">Nghĩa của từ</h2>
+      <div class="definition-card">
+        <div class="def-vi" id="detail-vi">...</div>
+        <div class="def-en" id="detail-en">...</div>
+      </div>
+    </div>
+
+    <div class="detail-section" id="section-example" style="display:none">
+      <h2 class="section-heading">Ví dụ thực tế</h2>
+      <div class="example-card" id="detail-example">...</div>
+    </div>
+
+    <div class="detail-section">
+      <h2 class="section-heading">Gán Tags</h2>
+      <div class="detail-tags" id="detail-tags"></div>
+      <div style="position:relative">
+        <input type="text" id="detail-tag-input" class="tag-input-inline" placeholder="+ Thêm tag mới (Enter để lưu)..." autocomplete="off">
+        <div class="dd-tag-suggestions" id="detail-tag-sugg" style="display:none; bottom: auto; top: calc(100% + 4px);"></div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h2 class="section-heading">Tiến độ ôn tập (SRS)</h2>
+      <div class="srs-stats">
+        <div class="srs-stat">
+          <span class="srs-stat__num" id="stat-reviews">0</span>
+          <span class="srs-stat__label">Lần ôn</span>
+        </div>
+        <div class="srs-stat">
+          <span class="srs-stat__num" id="stat-interval">0</span>
+          <span class="srs-stat__label">Ngày kế</span>
+        </div>
+        <div class="srs-stat">
+          <span class="srs-stat__num" id="stat-ease">0.0</span>
+          <span class="srs-stat__label">Ease</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section" id="section-source" style="display:none">
+      <h2 class="section-heading">Nguồn lưu từ</h2>
+      <a class="source-link" id="detail-source-link" target="_blank">...</a>
+    </div>
+  </div>
+
+  <script src="../shared/storage.js"></script>
+  <script src="word.js"></script>
+</body>
+</html>

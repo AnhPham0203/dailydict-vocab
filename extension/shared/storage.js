@@ -21,22 +21,30 @@ window.DailyDictStorage = {
       intervalDays: 1,
       easeFactor: 2.5,
       reviewCount: 0,
-      lastRating: null
+      lastRating: null,
+      tags: wordData.tags || [] // v1.3: Tags field
     }
     words.push(newWord)
     await chrome.storage.local.set({ dd_words: words })
     
-    // v1.2: Check goal & badges & milestones
-    await this.checkAndSaveTodayGoal()
-    const newBadges = await this.checkAndUnlockBadges()
-    const streak = await this.getCurrentStreak()
-    const settings = await this.getSettings()
-    
+    // v1.2 & v1.3: Robust post-save logic
+    let newBadges = []
     let milestoneReached = null
-    const milestones = [7, 14, 30, 60, 100, 200, 365]
-    if (milestones.includes(streak) && streak > (settings.lastStreakCelebration || 0)) {
-      milestoneReached = streak
-      await this.saveSettings({ lastStreakCelebration: streak })
+
+    try {
+      await this.checkAndSaveTodayGoal()
+      newBadges = await this.checkAndUnlockBadges()
+      
+      const streak = await this.getCurrentStreak()
+      const settings = await this.getSettings()
+      const milestones = [7, 14, 30, 60, 100, 200, 365]
+      
+      if (milestones.includes(streak) && streak > (settings.lastStreakCelebration || 0)) {
+        milestoneReached = streak
+        await this.saveSettings({ lastStreakCelebration: streak })
+      }
+    } catch (e) {
+      console.error('Post-save error:', e)
     }
     
     return { success: true, word: newWord, newBadges, milestoneReached }
@@ -45,9 +53,16 @@ window.DailyDictStorage = {
   async getWords() {
     return new Promise((resolve) => {
       chrome.storage.local.get('dd_words', (result) => {
-        resolve(result.dd_words || [])
+        const words = result.dd_words || []
+        // Ensure backward compatibility for tags
+        resolve(words.map(w => ({ ...w, tags: w.tags || [] })))
       })
     })
+  },
+
+  async getWordById(id) {
+    const words = await this.getWords()
+    return words.find(w => w.id === id) || null
   },
 
   async getWordsDueToday() {
@@ -86,6 +101,126 @@ window.DailyDictStorage = {
     const words = await this.getWords()
     const filtered = words.filter(w => w.id !== wordId)
     await chrome.storage.local.set({ dd_words: filtered })
+  },
+
+  // --- TAG CRUD (v1.3) ---
+  async getTags() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get('dd_tags', (result) => {
+        resolve(result.dd_tags || [])
+      })
+    })
+  },
+
+  async createTag(name, color) {
+    const tags = await this.getTags()
+    const normalized = name.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
+    
+    if (tags.find(t => t.name.toLowerCase() === normalized.toLowerCase())) {
+      return { success: false, reason: 'exists' }
+    }
+
+    const newTag = {
+      id: 'tag-' + Math.random().toString(36).substring(2, 11),
+      name: normalized,
+      color: color || '#4F46E5',
+      createdAt: new Date().toISOString()
+    }
+    tags.push(newTag)
+    await chrome.storage.local.set({ dd_tags: tags })
+    return { success: true, tag: newTag }
+  },
+
+  async deleteTag(tagId) {
+    const tags = await this.getTags()
+    const tagToDelete = tags.find(t => t.id === tagId)
+    if (!tagToDelete) return
+
+    // 1. Remove tag definition
+    const filteredTags = tags.filter(t => t.id !== tagId)
+    await chrome.storage.local.set({ dd_tags: filteredTags })
+
+    // 2. Remove tag from all words
+    const words = await this.getWords()
+    const tagName = tagToDelete.name
+    const updatedWords = words.map(w => ({
+      ...w,
+      tags: (w.tags || []).filter(t => t !== tagName)
+    }))
+    await chrome.storage.local.set({ dd_words: updatedWords })
+  },
+
+  async renameTag(tagId, newName) {
+    const tags = await this.getTags()
+    const tag = tags.find(t => t.id === tagId)
+    if (!tag) return
+
+    const oldName = tag.name
+    const normalized = newName.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
+    tag.name = normalized
+    await chrome.storage.local.set({ dd_tags: tags })
+
+    // Update all words with new tag name
+    const words = await this.getWords()
+    const updatedWords = words.map(w => ({
+      ...w,
+      tags: (w.tags || []).map(t => t === oldName ? normalized : t)
+    }))
+    await chrome.storage.local.set({ dd_words: updatedWords })
+  },
+
+  async addTagToWord(wordId, tagName) {
+    const words = await this.getWords()
+    const word = words.find(w => w.id === wordId)
+    if (!word) return
+
+    const normalized = tagName.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
+    
+    // Ensure word.tags exists
+    if (!word.tags) word.tags = []
+    
+    // Check limit
+    if (word.tags.length >= 10) return { success: false, reason: 'limit' }
+    
+    // Add if not exists
+    if (!word.tags.includes(normalized)) {
+      word.tags.push(normalized)
+      await chrome.storage.local.set({ dd_words: words })
+      
+      // Auto create tag definition if not exists
+      const tags = await this.getTags()
+      if (!tags.find(t => t.name.toLowerCase() === normalized.toLowerCase())) {
+        const randomColor = window.TAG_COLORS ? window.TAG_COLORS[Math.floor(Math.random() * window.TAG_COLORS.length)].hex : '#4F46E5'
+        await this.createTag(normalized, randomColor)
+      }
+    }
+    return { success: true }
+  },
+
+  async removeTagFromWord(wordId, tagName) {
+    const words = await this.getWords()
+    const word = words.find(w => w.id === wordId)
+    if (!word) return
+
+    word.tags = (word.tags || []).filter(t => t !== tagName)
+    await chrome.storage.local.set({ dd_words: words })
+  },
+
+  async getTagsWithCount() {
+    const words = await this.getWords()
+    const tags = await this.getTags()
+    
+    const countMap = {}
+    words.forEach(w => {
+      (w.tags || []).forEach(t => {
+        countMap[t] = (countMap[t] || 0) + 1
+      })
+    })
+
+    return tags.map(t => ({
+      ...t,
+      count: countMap[t.name] || 0
+    })).sort((a, b) => b.count - a.count)
   },
 
   // --- SETTINGS & DAILY GOAL (v1.2) ---

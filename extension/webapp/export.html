@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xuất & Nhập dữ liệu — DailyDict Vocab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <span class="brand-icon">←</span>
+        <span class="brand-name">Dashboard</span>
+      </a>
+      <h1 style="font-size: var(--text-base); font-weight: var(--weight-semi); color: var(--c-text-1);">Xuất & Nhập dữ liệu</h1>
+      <div style="width: 80px;"></div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Export Section -->
+    <section class="export-section" style="margin-bottom: var(--space-10);">
+      <div class="export-scope">
+        <h2 class="section-heading">1. Chọn dữ liệu cần xuất</h2>
+        <div class="scope-options">
+          <label class="scope-opt">
+            <input type="radio" name="scope" value="all" checked>
+            <span class="scope-opt__label">Tất cả từ vựng</span>
+            <span class="scope-opt__count" id="scope-all-count">0 từ</span>
+          </label>
+          <label class="scope-opt">
+            <input type="radio" name="scope" value="due">
+            <span class="scope-opt__label">Cần ôn tập hôm nay</span>
+            <span class="scope-opt__count" id="scope-due-count">0 từ</span>
+          </label>
+          <label class="scope-opt" id="scope-tag-opt" style="display:none">
+            <input type="radio" name="scope" value="tag">
+            <span class="scope-opt__label">Tag: <strong id="scope-tag-name"></strong></span>
+            <span class="scope-opt__count" id="scope-tag-count">0 từ</span>
+          </label>
+        </div>
+      </div>
+
+      <h2 class="section-heading">2. Chọn định dạng xuất</h2>
+      <div class="export-cards">
+        <div class="export-card">
+          <div class="export-card__icon">💾</div>
+          <div class="export-card__content">
+            <h3 class="export-card__title">JSON Backup</h3>
+            <p class="export-card__desc">Toàn bộ dữ liệu gốc bao gồm SRS history, tags, streak. Dùng để backup hoặc chuyển sang thiết bị khác.</p>
+            <div class="export-card__meta">
+              <span class="export-tag">Đầy đủ nhất</span>
+              <span class="export-tag">Có thể Import ngược lại</span>
+            </div>
+          </div>
+          <button class="export-btn" data-format="json">Tải JSON</button>
+        </div>
+
+        <div class="export-card">
+          <div class="export-card__icon">📊</div>
+          <div class="export-card__content">
+            <h3 class="export-card__title">CSV Spreadsheet</h3>
+            <p class="export-card__desc">Mở bằng Excel, Google Sheets. Cột: Word, Phonetic, Nghĩa VI, Nghĩa EN, Ví dụ, Tags, Bài học.</p>
+            <div class="export-card__meta">
+              <span class="export-tag">Excel / Sheets</span>
+            </div>
+          </div>
+          <button class="export-btn" data-format="csv">Tải CSV</button>
+        </div>
+
+        <div class="export-card">
+          <div class="export-card__icon">🃏</div>
+          <div class="export-card__content">
+            <h3 class="export-card__title">Anki Deck (Txt)</h3>
+            <p class="export-card__desc">Định dạng Tab-separated để import vào Anki. Hỗ trợ đầy đủ Nghĩa và Ví dụ.</p>
+            <div class="export-card__meta">
+              <span class="export-tag">Anki Compatible</span>
+            </div>
+          </div>
+          <button class="export-btn" data-format="anki">Tải cho Anki</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Import Section -->
+    <section class="import-section">
+      <h2 class="section-heading">Nhập dữ liệu</h2>
+      
+      <div class="import-drop" id="import-drop">
+        <div class="import-drop__inner">
+          <span class="import-drop__icon">📂</span>
+          <p class="import-drop__title">Kéo thả file vào đây</p>
+          <p class="import-drop__sub">hoặc</p>
+          <label class="import-browse-btn">
+            Chọn file từ máy tính
+            <input type="file" id="import-file" accept=".json,.csv" style="display:none">
+          </label>
+          <p class="import-drop__hint">Hỗ trợ: JSON backup, CSV</p>
+        </div>
+      </div>
+
+      <!-- Preview before import -->
+      <div id="import-preview" class="import-preview" style="display:none">
+        <div class="import-preview__header">
+          <div>
+            <div class="import-preview__title" id="preview-title">...</div>
+            <div class="import-preview__meta" id="preview-meta">...</div>
+          </div>
+          <div class="import-preview__actions">
+            <button class="btn-sm-primary" id="btn-confirm-import">Bắt đầu nhập</button>
+            <button class="cta-secondary" style="padding: var(--space-2) var(--space-4); font-size: var(--text-sm);" id="btn-cancel-import">Huỷ</button>
+          </div>
+        </div>
+        <div class="import-options">
+          <label class="import-opt">
+            <input type="radio" name="import-mode" value="merge" checked>
+            <span><strong>Gộp (Merge)</strong> — Giữ từ hiện có, chỉ thêm từ mới chưa có trong kho.</span>
+          </label>
+          <label class="import-opt">
+            <input type="radio" name="import-mode" value="replace">
+            <span><strong>Thay thế (Replace)</strong> — <span style="color:var(--c-danger); font-weight:600;">Xoá toàn bộ</span> dữ liệu hiện tại và thay bằng file này.</span>
+          </label>
+        </div>
+      </div>
+
+      <div id="import-result" class="import-result" style="display:none; margin-top: var(--space-4);"></div>
+    </section>
+  </div>
+
+  <script src="../shared/storage.js"></script>
+  <script src="export.js"></script>
+</body>
+</html>
