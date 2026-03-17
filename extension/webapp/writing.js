@@ -6,25 +6,46 @@ let wrongWords  = []   // [{word, userInput, definitionVi}]
 let attempts    = 0
 let hintUsed    = false
 
+function showGlobalError(message = 'Đã xảy ra lỗi. Vui lòng thử tải lại trang.') {
+  const container = document.querySelector('.container')
+  if (!container) return
+  container.innerHTML = `
+    <div class="empty-state" style="padding: 80px 20px;">
+      <div class="empty-state__circle" style="background: var(--c-danger-bg);">
+        <span class="empty-state__icon">⚠️</span>
+      </div>
+      <h3 class="empty-state__title">Có lỗi xảy ra</h3>
+      <p class="empty-state__desc">${message}</p>
+      <button onclick="location.reload()" class="empty-state__cta" style="border: none; background: var(--c-primary); color: white; cursor: pointer; padding: 10px 20px; border-radius: 8px; margin-top: 20px; font-weight: 600;">
+        Tải lại trang
+      </button>
+    </div>`
+}
+
 // ── Init ──
 async function init(wordList = null) {
-  const allWords = await window.DailyDictStorage.getWords()
+  try {
+    const allWords = await window.DailyDictStorage.getWords()
 
-  if (wordList) {
-    queue = wordList
-  } else {
-    // Ưu tiên từ đến hạn, fallback 15 từ mới nhất
-    const due = allWords.filter(w => new Date(w.nextReviewAt) <= new Date())
-    queue = due.length >= 3 ? due : allWords.slice(-15).reverse()
+    if (wordList) {
+      queue = wordList
+    } else {
+      // Ưu tiên từ đến hạn, fallback 15 từ mới nhất
+      const due = allWords.filter(w => new Date(w.nextReviewAt) <= new Date())
+      queue = due.length >= 3 ? due : allWords.slice(-15).reverse()
+    }
+
+    if (queue.length === 0) {
+      document.getElementById('wp-card').innerHTML = '<div class="empty-state"><div class="empty-state__circle"><span class="empty-state__icon">✍️</span></div><h3 class="empty-state__title">Chưa có từ vựng</h3><p class="empty-state__desc">Lưu thêm từ mới để bắt đầu luyện viết nhé!</p></div>'
+      return
+    }
+
+    queue = queue.sort(() => Math.random() - 0.5)
+    showWord(0)
+  } catch (err) {
+    console.error('Writing init error:', err)
+    showGlobalError()
   }
-
-  if (queue.length === 0) {
-    document.getElementById('wp-card').innerHTML = '<div class="empty-state">Chưa có từ nào để luyện tập. Hãy lưu thêm từ mới nhé!</div>'
-    return
-  }
-
-  queue = queue.sort(() => Math.random() - 0.5)
-  showWord(0)
 }
 
 // ── Hiện từ ──
@@ -36,7 +57,13 @@ function showWord(idx) {
   hintUsed = false
 
   document.getElementById('wp-vi').textContent    = word.definitionVi || '(chưa có nghĩa)'
-  document.getElementById('wp-en').textContent    = word.definitionEn || ''
+  
+  // BUG-04: Hide EN by default and reset
+  const enEl = document.getElementById('wp-en')
+  if (enEl) {
+    enEl.style.display = 'none'
+    enEl.textContent = ''
+  }
   
   const input = document.getElementById('wp-input')
   input.value = ''
@@ -146,6 +173,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const word = queue[currentIdx]
     if (word?.phonetic) {
       showFeedback('hint', `💡 Phonetic: ${word.phonetic}`)
+    }
+  })
+
+  // BUG-04: Show EN definition hint
+  document.getElementById('btn-show-en')?.addEventListener('click', () => {
+    const word = queue[currentIdx]
+    const el = document.getElementById('wp-en')
+    if (el && word?.definitionEn) {
+      el.textContent = word.definitionEn
+      el.style.display = 'block'
     }
   })
 

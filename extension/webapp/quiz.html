@@ -32,6 +32,31 @@
       margin: 0 auto var(--space-8);
       padding: 0 var(--space-5);
     }
+
+    /* Result styles (copied from writing.html for consistency) */
+    .wp-result {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--space-12) var(--space-6);
+      text-align: center;
+      gap: var(--space-4);
+    }
+    .result-score { font-size: var(--text-2xl); font-weight: var(--weight-bold); color: var(--c-text-1); }
+    .result-pct { font-size: var(--text-lg); color: var(--c-primary); font-weight: var(--weight-semi); }
+    
+    .wrong-row {
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-4);
+      background: var(--c-danger-bg);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-3);
+      text-align: left;
+      border: 1px solid #FECACA;
+    }
+    .wrong-word { font-weight: var(--weight-bold); color: var(--c-danger); font-size: var(--text-base); }
+    .wrong-vi { font-size: var(--text-sm); color: var(--c-text-3); margin-top: 2px; }
   </style>
 </head>
 <body>

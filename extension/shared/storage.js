@@ -12,7 +12,8 @@ window.DailyDictStorage = {
       word: wordData.word,
       phonetic: wordData.phonetic || null,
       definitionEn: wordData.definitionEn || null,
-      definitionVi: wordData.definitionVi || null,
+      definitionVi: wordData.definitionViMain || null,
+      definitionViDict: wordData.definitionViDict || null,
       example: wordData.example || null,
       sourceLesson: wordData.sourceLesson || null,
       sourceUrl: wordData.sourceUrl || null,
@@ -21,6 +22,7 @@ window.DailyDictStorage = {
       intervalDays: 1,
       easeFactor: 2.5,
       reviewCount: 0,
+      reviewGoodCount: 0, // BUG-02: Track good reviews for accurate retentionRate
       lastRating: null,
       tags: wordData.tags || [] // v1.3: Tags field
     }
@@ -54,8 +56,12 @@ window.DailyDictStorage = {
     return new Promise((resolve) => {
       chrome.storage.local.get('dd_words', (result) => {
         const words = result.dd_words || []
-        // Ensure backward compatibility for tags
-        resolve(words.map(w => ({ ...w, tags: w.tags || [] })))
+        // Ensure backward compatibility for tags and reviewGoodCount
+        resolve(words.map(w => ({ 
+          ...w, 
+          tags: w.tags || [],
+          reviewGoodCount: w.reviewGoodCount || 0 
+        })))
       })
     })
   },
@@ -77,10 +83,16 @@ window.DailyDictStorage = {
     if (!word) return
 
     let { intervalDays, easeFactor } = word
-    if (rating === 'again') intervalDays = 1
-    else if (rating === 'hard') intervalDays = Math.max(1, intervalDays * 1.2)
-    else if (rating === 'good') intervalDays = intervalDays * easeFactor
-    else if (rating === 'easy') {
+    // BUG-01: Update easeFactor according to SM-2
+    if (rating === 'again') {
+      intervalDays = 1
+      easeFactor = Math.max(1.3, easeFactor - 0.2)
+    } else if (rating === 'hard') {
+      intervalDays = Math.max(1, intervalDays * 1.2)
+      easeFactor = Math.max(1.3, easeFactor - 0.15)
+    } else if (rating === 'good') {
+      intervalDays = intervalDays * easeFactor
+    } else if (rating === 'easy') {
       intervalDays = intervalDays * easeFactor * 1.3
       easeFactor = Math.min(4.0, easeFactor + 0.15)
     }
@@ -90,6 +102,11 @@ window.DailyDictStorage = {
     word.nextReviewAt = new Date(Date.now() + intervalDays * 86400000).toISOString()
     word.reviewCount += 1
     word.lastRating = rating
+
+    // BUG-02: Update good review count
+    if (rating === 'good' || rating === 'easy') {
+      word.reviewGoodCount = (word.reviewGoodCount || 0) + 1
+    }
 
     await chrome.storage.local.set({ dd_words: words })
     
@@ -289,8 +306,9 @@ window.DailyDictStorage = {
     const unlockedIds = new Set(badges.map(b => b.id))
 
     const totalReviews = words.reduce((s, w) => s + w.reviewCount, 0)
-    const goodReviews = words.filter(w => ['good', 'easy'].includes(w.lastRating)).length
-    const retentionRate = totalReviews > 0 ? Math.round((goodReviews / Math.max(words.length, 1)) * 100) : 0
+    // BUG-02: Accurate good review count
+    const goodReviews = words.reduce((sum, w) => sum + (w.reviewGoodCount || 0), 0)
+    const retentionRate = totalReviews > 0 ? Math.round((goodReviews / totalReviews) * 100) : 0
     const streak = await this.getCurrentStreak()
     const goalHistory = settings.goalHistory || {}
     const goalCompletedDays = Object.values(goalHistory).filter(Boolean).length
@@ -398,10 +416,10 @@ window.DailyDictStorage = {
     const todayCount = words.filter(w => new Date(w.createdAt).toDateString() === today).length
     const dueCount = words.filter(w => new Date(w.nextReviewAt) <= now).length
 
-    // Retention rate (v1.2 refined)
+    // Retention rate (v1.2 refined BUG-02)
     const totalReviews = words.reduce((sum, w) => sum + w.reviewCount, 0)
-    const goodReviews = words.filter(w => w.lastRating === 'good' || w.lastRating === 'easy').length
-    const retentionRate = totalReviews > 0 ? Math.round((goodReviews / Math.max(words.length, 1)) * 100) : 0
+    const goodReviews = words.reduce((sum, w) => sum + (w.reviewGoodCount || 0), 0)
+    const retentionRate = totalReviews > 0 ? Math.round((goodReviews / totalReviews) * 100) : 0
 
     const streak = await this.getCurrentStreak()
 

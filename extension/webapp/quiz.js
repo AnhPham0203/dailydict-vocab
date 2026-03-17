@@ -6,25 +6,49 @@ let streak       = 0
 let wrongWords   = []
 let answered     = false
 
+function showGlobalError(message = 'Đã xảy ra lỗi. Vui lòng thử tải lại trang.') {
+  const container = document.querySelector('.container')
+  if (!container) return
+  container.innerHTML = `
+    <div class="empty-state" style="padding: 80px 20px;">
+      <div class="empty-state__circle" style="background: var(--c-danger-bg);">
+        <span class="empty-state__icon">⚠️</span>
+      </div>
+      <h3 class="empty-state__title">Có lỗi xảy ra</h3>
+      <p class="empty-state__desc">${message}</p>
+      <button onclick="location.reload()" class="empty-state__cta" style="border: none; background: var(--c-primary); color: white; cursor: pointer; padding: 10px 20px; border-radius: 8px; margin-top: 20px; font-weight: 600;">
+        Tải lại trang
+      </button>
+    </div>`
+}
+
 // ── Init ──
 async function init() {
-  const allWords = await window.DailyDictStorage.getWords()
+  try {
+    const allWords = await window.DailyDictStorage.getWords()
 
-  if (allWords.length < 4) {
-    document.querySelector('.container').innerHTML = `
-      <div class="empty-state" style="padding: 60px 20px;">
-        <div class="empty-emoji">🎯</div>
-        <p>Cần ít nhất 4 từ trong kho để chơi trắc nghiệm.<br>Hãy lưu thêm từ mới nhé!</p>
-        <a href="index.html" class="btn-primary" style="display:inline-block; margin-top:20px; text-decoration:none; width:auto; padding:12px 32px;">← Về Dashboard</a>
-      </div>`
-    return
+    if (allWords.length < 4) {
+      document.querySelector('.container').innerHTML = `
+        <div class="empty-state" style="padding: 60px 20px;">
+          <div class="empty-state__circle">
+            <span class="empty-state__icon">🎯</span>
+          </div>
+          <h3 class="empty-state__title">Cần thêm từ vựng</h3>
+          <p class="empty-state__desc">Cần ít nhất 4 từ trong kho để chơi trắc nghiệm. Hãy lưu thêm từ mới nhé!</p>
+          <a href="index.html" class="empty-state__cta" style="display:inline-block; margin-top:20px; text-decoration:none;">← Về Dashboard</a>
+        </div>`
+      return
+    }
+
+    // Lấy từ cần ôn, fallback 20 từ gần nhất
+    const due = allWords.filter(w => new Date(w.nextReviewAt) <= new Date())
+    queue = (due.length >= 4 ? due : allWords.slice(-20)).sort(() => Math.random() - 0.5)
+
+    showQuestion(0)
+  } catch (err) {
+    console.error('Quiz init error:', err)
+    showGlobalError()
   }
-
-  // Lấy từ cần ôn, fallback 20 từ gần nhất
-  const due = allWords.filter(w => new Date(w.nextReviewAt) <= new Date())
-  queue = (due.length >= 4 ? due : allWords.slice(-20)).sort(() => Math.random() - 0.5)
-
-  showQuestion(0)
 }
 
 // ── Tạo 4 lựa chọn ──
@@ -55,6 +79,10 @@ async function showQuestion(idx) {
   document.getElementById('quiz-word').textContent     = word.word
   document.getElementById('quiz-phonetic').textContent = word.phonetic || ''
   updateProgress(idx)
+
+  // BUG-07: Auto-play audio
+  const utter = new SpeechSynthesisUtterance(word.word)
+  utter.lang = 'en-US'; utter.rate = 0.85; window.speechSynthesis.cancel(); window.speechSynthesis.speak(utter)
 
   const choices = await getChoices(word)
   const container = document.getElementById('quiz-choices')
@@ -104,10 +132,10 @@ function updateStreak() {
   const el = document.getElementById('quiz-score-display')
   if (streak >= 3) {
     el.textContent = `${streak} đúng liên tiếp 🔥`
-    el.style.color = '#D97706'
+    el.style.color = 'var(--c-streak)'
   } else {
     el.textContent = `${correctCount} đúng / ${currentIdx + (answered ? 1 : 0)} câu`
-    el.style.color = 'var(--text-muted)'
+    el.style.color = 'var(--c-text-3)'
   }
 }
 

@@ -33,6 +33,13 @@
         <div id="card-front" style="width: 100%;">
           <div id="word-text" class="flashcard-word">...</div>
           <div id="phonetic-text" class="flashcard-phonetic">...</div>
+          <button id="btn-audio-review" style="
+            background: var(--c-primary-light); color: var(--c-primary);
+            border: none; border-radius: var(--radius-md);
+            padding: var(--space-2) var(--space-4); cursor: pointer;
+            font-size: var(--text-sm); font-weight: 600;
+            margin-top: var(--space-4); font-family: var(--font-main);
+          ">🔊 Nghe phát âm</button>
           <div class="flashcard-hint">
             <span>🖱️ Click hoặc ⌨️ Space để xem nghĩa</span>
           </div>
@@ -80,5 +87,6 @@
 
   <script src="../shared/storage.js"></script>
   <script src="app.js"></script>
+  <script src="review-app.js"></script>
 </body>
 </html>

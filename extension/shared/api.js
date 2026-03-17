@@ -20,7 +20,8 @@ window.DailyDictAPI = {
       phonetic: dictResult.status === 'fulfilled' ? dictResult.value?.phonetic : null,
       definitionEn: dictResult.status === 'fulfilled' ? dictResult.value?.definitionEn : null,
       example: dictResult.status === 'fulfilled' ? dictResult.value?.example : null,
-      definitionVi: translateResult.status === 'fulfilled' ? translateResult.value : null,
+      definitionViMain: translateResult.status === 'fulfilled' ? translateResult.value?.main || null : null,
+      definitionViDict: translateResult.status === 'fulfilled' ? translateResult.value?.dict || null : null,
     }
 
     // 4. Cache
@@ -53,13 +54,31 @@ window.DailyDictAPI = {
     setTimeout(() => controller.abort(), 5000)
     try {
       const res = await fetch(
-        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|vi`,
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&dt=bd&q=${encodeURIComponent(word)}`,
         { signal: controller.signal }
       )
       if (!res.ok) return null
       const json = await res.json()
-      return json?.responseData?.translatedText || null
+
+      // json[0][0][0] is the main translation
+      const mainTranslation = json?.[0]?.[0]?.[0]
+      if (!mainTranslation) return null
+
+      // json[1] is the dictionary part (pos and alternative terms)
+      let dictionary = []
+      if (json?.[1]) {
+        dictionary = json[1].map(item => ({
+          pos: item[0], // part of speech (e.g., "noun", "verb")
+          terms: item[1] // array of terms
+        }))
+      }
+
+      return {
+        main: mainTranslation,
+        dict: dictionary.length > 0 ? dictionary : null
+      }
     } catch (e) {
+      console.error('Translate error:', e)
       return null
     }
   }

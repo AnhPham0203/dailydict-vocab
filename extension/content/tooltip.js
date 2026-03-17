@@ -215,17 +215,25 @@ function buildLoadingHTML(word) {
 }
 
 function buildTooltipHTML(word, data) {
-  const phonetic = data?.phonetic     ? `<span class="dd-phonetic">${data.phonetic}</span>` : ''
-  const vi       = data?.definitionVi ? `<div class="dd-vi">${data.definitionVi}</div>` : ''
-  const en       = data?.definitionEn ? `<div class="dd-en">${data.definitionEn}</div>` : ''
-  const example  = data?.example      ? `<div class="dd-example">"${data.example}"</div>` : ''
-  const noData   = (!vi && !en)       ? `<div class="dd-no-data">Không tìm được nghĩa 😕</div>` : ''
-  const lesson   = document.querySelector('h1')?.textContent?.trim() || ''
-  const ctx      = lesson ? `<span class="dd-context" title="${lesson}">📌 ${lesson.slice(0,38)}...</span>` : '<span></span>'
+  const phonetic = data?.phonetic ? `<span class="dd-phonetic">${data.phonetic}</span>` : ''
+  const viMain   = data?.definitionViMain ? `<div class="dd-vi">${data.definitionViMain}</div>` : ''
+  
+  let viDict = ''
+  if (data?.definitionViDict) {
+    viDict = `<div class="dd-dict" style="font-size: 12px; color: #78716C; margin-top: 4px;">` + 
+      data.definitionViDict.map(item => 
+        `<div style="margin-bottom: 2px;"><i>${item.pos}:</i> ${item.terms.join(', ')}</div>`
+      ).join('') + 
+      `</div>`
+  }
+
+  const noData = (!viMain && !viDict) ? `<div class="dd-no-data">Không tìm được nghĩa 😕</div>` : ''
+  const lesson = document.querySelector('h1')?.textContent?.trim() || ''
+  const ctx    = lesson ? `<span class="dd-context" title="${lesson}">📌 ${lesson.slice(0,38)}...</span>` : '<span></span>'
 
   return `
     <div class="dd-header"><span class="dd-word">${word}</span>${phonetic}</div>
-    <div class="dd-body">${vi}${en}${example}${noData}</div>
+    <div class="dd-body">${viMain}${viDict}${noData}</div>
     <div class="dd-footer">${ctx}<button class="dd-save-btn">+ Lưu từ này</button></div>`
 }
 

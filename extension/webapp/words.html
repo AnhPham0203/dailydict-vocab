@@ -178,6 +178,17 @@
       <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm từ vựng hoặc nghĩa...">
     </div>
 
+    <!-- BUG-03: Data Actions (Export/Import) -->
+    <div class="data-actions" style="display:flex; gap:8px; margin-bottom: 16px;">
+      <button id="btn-export-json" class="cta-secondary" style="flex:1; justify-content:center;">
+        ⬇️ Xuất dữ liệu (JSON)
+      </button>
+      <label class="cta-secondary" style="flex:1; justify-content:center; cursor:pointer;">
+        ⬆️ Nhập dữ liệu (JSON)
+        <input type="file" id="import-file-json" accept=".json" style="display:none;">
+      </label>
+    </div>
+
     <!-- Filter Bar -->
     <div class="filter-bar" id="filter-bar">
       <div class="filter-group">
@@ -237,5 +248,6 @@
   <script src="../shared/tags.js"></script>
   <script src="../shared/storage.js"></script>
   <script src="app.js"></script>
+  <script src="words-app.js"></script>
 </body>
 </html>
