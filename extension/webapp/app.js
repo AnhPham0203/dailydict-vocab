@@ -107,7 +107,7 @@ function showDone(count) {
     : "Hôm nay bạn không có từ nào cần ôn tập. Hãy lưu thêm từ mới nhé!"
 }
 
-// --- DASHBOARD LOGIC ---
+// --- DASHBOARD LOGIC (v1.2 Updated) ---
 async function initDashboard() {
   if (!window.location.pathname.includes('index.html')) return
   
@@ -122,6 +122,14 @@ async function initDashboard() {
 
   renderChart(words)
   renderDueList(dueToday)
+  
+  // v1.2 Features
+  renderGoalRing()
+  renderHeatmap()
+  checkStreakWarning()
+  checkNewBadges()
+  
+  initGoalSetter()
 
   const btn = document.getElementById('btn-start-review')
   const badge = document.getElementById('due-count-badge')
@@ -185,6 +193,209 @@ function renderDueList(dueWords) {
       </div>
     </div>
   `).join('')
+}
+
+// --- v1.2 DASHBOARD FEATURES ---
+
+async function renderGoalRing() {
+  const goal = await window.DailyDictStorage.getDailyGoal()
+  const todayCount = await window.DailyDictStorage.getTodayCount()
+  const pct = Math.min(100, Math.round((todayCount / goal) * 100))
+
+  const CIRCUMFERENCE = 201.06
+  const offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE
+
+  const ring = document.getElementById('ring-progress')
+  const num = document.getElementById('ring-num')
+  const label = document.getElementById('ring-label')
+  const wrap = document.getElementById('goal-ring-wrap')
+
+  if (ring) {
+    ring.style.strokeDasharray = CIRCUMFERENCE
+    ring.style.strokeDashoffset = CIRCUMFERENCE
+    ring.getBoundingClientRect() // force reflow
+    ring.style.strokeDashoffset = offset
+    
+    // Màu ring theo %
+    if (pct >= 100) ring.style.stroke = '#16A34A'
+    else if (pct >= 50) ring.style.stroke = '#4F46E5'
+    else ring.style.stroke = '#EA580C'
+  }
+
+  if (num) num.textContent = todayCount
+  if (label) label.textContent = `/ ${goal}`
+  
+  if (wrap && pct >= 100) {
+    wrap.classList.add('goal-achieved')
+  } else if (wrap) {
+    wrap.classList.remove('goal-achieved')
+  }
+}
+
+function initGoalSetter() {
+  const btnEdit = document.getElementById('btn-edit-goal')
+  const setter = document.getElementById('goal-setter')
+  const btnSave = document.getElementById('btn-save-goal')
+  const customInput = document.getElementById('goal-custom-input')
+
+  if (!btnEdit || !setter) return
+
+  btnEdit.addEventListener('click', () => {
+    setter.style.display = setter.style.display === 'none' ? 'block' : 'none'
+  })
+
+  document.querySelectorAll('.goal-opt').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      document.querySelectorAll('.goal-opt').forEach(b => b.classList.remove('active'))
+      btn.classList.add('active')
+      if (customInput) customInput.value = ''
+      await window.DailyDictStorage.setDailyGoal(parseInt(btn.dataset.val))
+      renderGoalRing()
+      setter.style.display = 'none'
+    })
+  })
+
+  btnSave?.addEventListener('click', async () => {
+    const val = parseInt(customInput.value)
+    if (!val || val < 1 || val > 100) return
+    await window.DailyDictStorage.setDailyGoal(val)
+    renderGoalRing()
+    setter.style.display = 'none'
+  })
+}
+
+async function renderHeatmap() {
+  const wrap = document.getElementById('heatmap-wrap')
+  if (!wrap) return
+  
+  const data = await window.DailyDictStorage.getHeatmapData(365)
+  const CELL_SIZE = 11
+  const CELL_GAP = 2
+  const WEEKS = 53
+  const DAYS = 7
+
+  const maxVal = Math.max(...Object.values(data), 1)
+
+  function getColor(count) {
+    if (count === 0) return 'var(--hm-0)'
+    const level = Math.ceil((count / maxVal) * 4)
+    return `var(--hm-${Math.min(level, 4)})`
+  }
+
+  const today = new Date()
+  const cells = []
+  for (let i = 364; i >= 0; i--) {
+    const d = new Date(today)
+    d.setDate(d.getDate() - i)
+    const key = d.toISOString().split('T')[0]
+    const count = data[key] || 0
+    const dow = (d.getDay() + 6) % 7 // 0=Mon, 6=Sun
+    cells.push({ date: key, count, dow, d })
+  }
+
+  const W = WEEKS * (CELL_SIZE + CELL_GAP)
+  const H = DAYS * (CELL_SIZE + CELL_GAP) + 20
+
+  let svg = `<svg width="100%" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`
+
+  // Month labels
+  let lastMonth = -1
+  let weekIdx = 0
+  cells.forEach((cell, i) => {
+    const wk = Math.floor(i / 7)
+    const month = cell.d.getMonth()
+    if (month !== lastMonth && wk !== weekIdx) {
+      const x = wk * (CELL_SIZE + CELL_GAP)
+      const monthNames = ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12']
+      svg += `<text x="${x}" y="10" font-size="9" fill="var(--c-text-4)" font-family="var(--font-main)">${monthNames[month]}</text>`
+      lastMonth = month
+      weekIdx = wk
+    }
+  })
+
+  // Cells
+  cells.forEach((cell, i) => {
+    const wk = Math.floor(i / 7)
+    const x = wk * (CELL_SIZE + CELL_GAP)
+    const y = cell.dow * (CELL_SIZE + CELL_GAP) + 16
+    const color = getColor(cell.count)
+    const label = cell.count > 0 ? `${cell.date}: ${cell.count} từ` : `${cell.date}: chưa học`
+
+    svg += `<rect x="${x}" y="${y}" width="${CELL_SIZE}" height="${CELL_SIZE}" rx="2" fill="${color}">
+      <title>${label}</title>
+    </rect>`
+  })
+
+  svg += '</svg>'
+  wrap.innerHTML = svg
+  
+  const total = Object.values(data).reduce((s, v) => s + v, 0)
+  const totalEl = document.getElementById('heatmap-total')
+  if (totalEl) totalEl.textContent = `${total} từ trong năm qua`
+}
+
+async function checkStreakWarning() {
+  const streak = await window.DailyDictStorage.getCurrentStreak()
+  if (streak === 0) return
+
+  const todayCount = await window.DailyDictStorage.getTodayCount()
+  if (todayCount > 0) return
+
+  const now = new Date()
+  if (now.getHours() < 20) return
+
+  const banner = document.createElement('div')
+  banner.className = 'streak-warning'
+  banner.innerHTML = `
+    <span class="streak-warning__icon">⚠️</span>
+    <div class="streak-warning__text">
+      <strong>Streak ${streak} ngày sắp bị mất!</strong>
+      <span>Lưu ít nhất 1 từ trước nửa đêm để giữ chuỗi.</span>
+    </div>
+    <a href="https://dailydictation.com" target="_blank" class="streak-warning__cta">Học ngay →</a>
+  `
+  document.querySelector('.app-header').insertAdjacentElement('afterend', banner)
+}
+
+async function checkNewBadges() {
+  const unseen = await window.DailyDictStorage.getUnseenBadges()
+  if (unseen.length > 0) {
+    const navLink = document.querySelector('a[href="achievements.html"]')
+    navLink?.classList.add('nav-link--has-new')
+  }
+}
+
+function showMilestoneToast(streak) {
+  const messages = {
+    7:   { emoji: '🔥', text: `${streak} ngày liên tiếp!`, sub: 'Thói quen đang hình thành.' },
+    14:  { emoji: '💪', text: `${streak} ngày liên tiếp!`, sub: 'Bạn thật kiên trì!' },
+    30:  { emoji: '🏆', text: `${streak} ngày liên tiếp!`, sub: 'Một tháng không nghỉ. Tuyệt vời!' },
+    60:  { emoji: '⭐', text: `${streak} ngày liên tiếp!`, sub: 'Hai tháng! Bạn là máy học từ.' },
+    100: { emoji: '👑', text: `${streak} ngày liên tiếp!`, sub: '100 ngày — Legend!' },
+  }
+
+  const msg = messages[streak] || { emoji: '🎯', text: `${streak} ngày liên tiếp!`, sub: '' }
+
+  const toast = document.createElement('div')
+  toast.className = 'milestone-toast'
+  toast.innerHTML = `
+    <div class="milestone-toast__inner">
+      <span class="milestone-toast__emoji">${msg.emoji}</span>
+      <div style="flex: 1;">
+        <div class="milestone-toast__title">${msg.text}</div>
+        <div class="milestone-toast__sub">${msg.sub}</div>
+      </div>
+      <button class="milestone-toast__close" id="toast-close">×</button>
+    </div>
+  `
+  document.body.appendChild(toast)
+
+  // Auto dismiss sau 5s
+  const timer = setTimeout(() => toast.remove(), 5000)
+  document.getElementById('toast-close')?.addEventListener('click', () => {
+    clearTimeout(timer)
+    toast.remove()
+  })
 }
 
 // --- WORD LIST LOGIC ---

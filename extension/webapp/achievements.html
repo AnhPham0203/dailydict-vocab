@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thành tích — DailyDict Vocab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <span class="brand-icon">←</span>
+        <span class="brand-name">Dashboard</span>
+      </a>
+      <h1 style="font-size: var(--text-base); font-weight: var(--weight-semi); color: var(--c-text-1);">Thành tích</h1>
+      <span id="badge-count" style="font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--c-text-3);">0 / 12</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Category filters -->
+    <div class="badge-filters" id="badge-filters">
+      <button class="badge-filter active" data-cat="all">Tất cả</button>
+      <button class="badge-filter" data-cat="vocab">📚 Từ vựng</button>
+      <button class="badge-filter" data-cat="streak">🔥 Streak</button>
+      <button class="badge-filter" data-cat="review">🃏 Ôn tập</button>
+      <button class="badge-filter" data-cat="goal">🎯 Mục tiêu</button>
+    </div>
+
+    <!-- Badge grid -->
+    <div class="badge-grid" id="badge-grid">
+      <!-- render bằng JS -->
+    </div>
+  </div>
+
+  <script src="../shared/badges.js"></script>
+  <script src="../shared/storage.js"></script>
+  <script src="achievements.js"></script>
+</body>
+</html>

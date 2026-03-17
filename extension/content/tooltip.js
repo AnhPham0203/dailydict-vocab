@@ -44,10 +44,56 @@ async function showTooltip(word, anchorRect) {
 
       btn.textContent = result.success ? '✓ Đã lưu' : 'Đã có rồi'
       btn.classList.toggle('saved', result.success)
+      
+      // v1.2: Milestone celebration & Badges
+      if (result.success) {
+        if (result.milestoneReached) {
+          showTooltipNotification(`🔥 Streak ${result.milestoneReached} ngày! Tuyệt vời!`)
+        }
+        if (result.newBadges && result.newBadges.length > 0) {
+          showTooltipNotification(`🏆 Đã mở khóa ${result.newBadges.length} huy hiệu mới!`)
+        }
+      }
     })
   } catch (err) {
     if (tip) tip.innerHTML = `<div class="dd-error">Lỗi khi tải dữ liệu</div>`
   }
+}
+
+function showTooltipNotification(text) {
+  const note = document.createElement('div')
+  note.style.cssText = `
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1C1917;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 2147483647;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  `
+  note.textContent = text
+  document.body.appendChild(note)
+  
+  // Animate in
+  setTimeout(() => {
+    note.style.opacity = '1'
+    note.style.transform = 'translateX(-50%) translateY(0)'
+  }, 10)
+  
+  // Auto remove
+  setTimeout(() => {
+    note.style.opacity = '0'
+    note.style.transform = 'translateX(-50%) translateY(-20px)'
+    setTimeout(() => note.remove(), 400)
+  }, 4000)
 }
 
 // ── Định vị tooltip thông minh ──
