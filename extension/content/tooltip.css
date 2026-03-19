@@ -18,6 +18,7 @@
   transition: opacity 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overflow: visible;
 }
 #dd-tooltip.dd-visible { opacity: 1; transform: translateY(0); }
 
@@ -126,12 +127,11 @@
   border: 1px solid #E7E5E4;
   border-radius: 10px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  overflow: hidden;
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 0;
-  width: 100%;
-  z-index: 100;
+  overflow-y: auto;
+  position: fixed;
+  z-index: 2147483647;
+  min-width: 200px;
+  max-height: 180px;
 }
 
 .dd-sugg-item {
@@ -152,4 +152,18 @@
   background: #F5F5F4;
   padding: 1px 6px;
   border-radius: 4px;
+}
+
+/* Dictionary entries in Tooltip & Detail */
+.dd-dict {
+  font-size: var(--text-xs);
+  color: var(--c-text-3);
+  margin-top: var(--space-2);
+  line-height: var(--leading-relaxed);
+}
+.dd-dict i {
+  color: var(--c-primary);
+  font-weight: 600;
+  font-style: normal;
+  margin-right: 4px;
 }

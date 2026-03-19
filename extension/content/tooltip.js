@@ -108,6 +108,12 @@ async function showSavedState(wordId, word) {
        <span class="dd-sugg-count">${t.count}</span></div>`
     ).join('')
     sugg.style.display = 'block'
+
+    // FIX-07: Calculate position for fixed dropdown relative to input
+    const inputRect = input.getBoundingClientRect()
+    sugg.style.top  = (inputRect.bottom + 4) + 'px'
+    sugg.style.left = inputRect.left + 'px'
+    sugg.style.width = inputRect.width + 'px'
   })
 
   input.addEventListener('keydown', async (e) => {

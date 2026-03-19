@@ -135,6 +135,8 @@ function showWord(idx) {
   updateProgress(idx)
   
   playAudio()
+  // FIX-06: Auto-focus after audio start
+  setTimeout(() => document.getElementById('wp-input')?.focus(), 100)
 }
 
 // ── Kiểm tra đáp án ──

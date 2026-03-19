@@ -19,6 +19,15 @@ function debounce(fn, ms) { let timeout; return function() { clearTimeout(timeou
 function getPillClass(r) { return !r ? 'status-pill status-pill--new' : r === 'again' ? 'status-pill status-pill--again' : r === 'hard' ? 'status-pill status-pill--hard' : r === 'easy' ? 'status-pill status-pill--easy' : 'status-pill status-pill--review' }
 function getPillLabel(r) { return !r ? 'Mới' : r === 'again' ? 'Quên' : r === 'hard' ? 'Khó' : 'Ôn tập' }
 
+function playAudio(word) {
+  if (!word) return
+  const utter = new SpeechSynthesisUtterance(word)
+  utter.lang = 'en-US'
+  utter.rate = 0.85
+  window.speechSynthesis.cancel()
+  window.speechSynthesis.speak(utter)
+}
+
 // --- DASHBOARD LOGIC ---
 async function initDashboard() {
   if (!window.location.pathname.includes('index.html')) return
@@ -36,13 +45,9 @@ async function initDashboard() {
 
     renderChart(words); renderDueList(dueToday); renderGoalRing(); renderHeatmap(); checkStreakWarning(); checkNewBadges(); initGoalSetter()
 
-    // BUG-09: Milestone Toast
+    // FIX-01: Milestone Toast on Load
     const settings = await window.DailyDictStorage.getSettings()
-    const milestones = [7, 14, 30, 60, 100, 200, 365]
-    if (milestones.includes(stats.streak) && stats.streak > (settings.lastStreakCelebration || 0)) {
-      setTimeout(() => showMilestoneToast(stats.streak), 800)
-      await window.DailyDictStorage.saveSettings({ lastStreakCelebration: stats.streak })
-    }
+    checkMilestoneOnLoad(stats.streak, settings)
 
     const btn = document.getElementById('btn-start-review'), badge = document.getElementById('due-count-badge')
     if (btn) {
@@ -137,16 +142,32 @@ async function renderHeatmap() {
   if (document.getElementById('heatmap-total')) document.getElementById('heatmap-total').textContent = `${total} từ trong năm qua`
 }
 
+// FIX-05: checkStreakWarning() with interval cleanup
 async function checkStreakWarning() {
+  let intervalId = null
+
   async function _doCheck() {
-    const streak = await window.DailyDictStorage.getCurrentStreak(), todayCount = await window.DailyDictStorage.getTodayCount()
-    if (streak === 0 || todayCount > 0 || new Date().getHours() < 20) { document.querySelector('.streak-warning')?.remove(); return }
+    const streak     = await window.DailyDictStorage.getCurrentStreak()
+    const todayCount = await window.DailyDictStorage.getTodayCount()
+
+    // Đã học hôm nay → xóa warning và DỪNG interval
+    if (streak === 0 || todayCount > 0) {
+      document.querySelector('.streak-warning')?.remove()
+      if (intervalId) { clearInterval(intervalId); intervalId = null }
+      return
+    }
+
+    if (new Date().getHours() < 20) return
+
     if (document.querySelector('.streak-warning')) return
-    const banner = document.createElement('div'); banner.className = 'streak-warning'
+    const banner = document.createElement('div')
+    banner.className = 'streak-warning'
     banner.innerHTML = `<span class="streak-warning__icon">⚠️</span><div class="streak-warning__text"><strong>Streak ${streak} ngày sắp bị mất!</strong><span>Lưu ít nhất 1 từ trước nửa đêm để giữ chuỗi.</span></div><a href="https://dailydictation.com" target="_blank" class="streak-warning__cta">Học ngay →</a>`
     document.querySelector('.app-header').insertAdjacentElement('afterend', banner)
   }
-  await _doCheck(); setInterval(_doCheck, 5 * 60 * 1000)
+
+  await _doCheck()
+  intervalId = setInterval(_doCheck, 5 * 60 * 1000)
 }
 
 async function checkNewBadges() {
@@ -162,6 +183,17 @@ function showMilestoneToast(streak) {
   document.body.appendChild(toast)
   const timer = setTimeout(() => toast.remove(), 5000)
   document.getElementById('toast-close')?.addEventListener('click', () => { clearTimeout(timer); toast.remove() })
+}
+
+// FIX-01 Helper
+async function checkMilestoneOnLoad(streak, settings) {
+  const milestones = [7, 14, 30, 60, 100, 200, 365]
+  const lastCelebrated = settings.lastStreakCelebration || 0
+
+  if (milestones.includes(streak) && streak > lastCelebrated) {
+    setTimeout(() => showMilestoneToast(streak), 800)
+    await window.DailyDictStorage.saveSettings({ lastStreakCelebration: streak })
+  }
 }
 
 document.addEventListener('DOMContentLoaded', initDashboard)

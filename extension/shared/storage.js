@@ -388,24 +388,31 @@ window.DailyDictStorage = {
   async getLongestStreak() {
     const words = await this.getWords()
     if (words.length === 0) return 0
-    
-    const days = Array.from(new Set(words.map(w => new Date(w.createdAt).toDateString())))
-      .map(d => new Date(d).getTime())
-      .sort((a, b) => a - b)
 
-    let longest = 0
+    // Dùng date string (YYYY-MM-DD) thay vì timestamp để tránh lỗi timezone
+    const uniqueDays = Array.from(
+      new Set(words.map(w => w.createdAt.split('T')[0]))
+    ).sort() // sort alphabetically = sort chronologically
+
+    if (uniqueDays.length === 0) return 0
+
+    let longest = 1
     let current = 1
-    
-    for (let i = 1; i < days.length; i++) {
-      const diff = days[i] - days[i-1]
-      if (diff <= 86400000 * 1.1) { // Cho phép sai số nhỏ do toDateString
+
+    for (let i = 1; i < uniqueDays.length; i++) {
+      const prev = new Date(uniqueDays[i - 1])
+      const curr = new Date(uniqueDays[i])
+      const diffDays = Math.round((curr - prev) / 86400000)
+
+      if (diffDays === 1) {
         current++
-      } else {
         longest = Math.max(longest, current)
+      } else {
         current = 1
       }
     }
-    return Math.max(longest, current)
+
+    return longest
   },
 
   async getStats() {

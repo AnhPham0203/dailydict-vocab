@@ -1,0 +1,13 @@
+<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <rect width="48" height="48" rx="11" fill="#4338CA"/>
+  <!-- Left page -->
+  <path d="M8,37 L8,12 C8,11 9,10 10,10 L22,10 L22,37 Z" fill="white" opacity="0.9"/>
+  <!-- Right page -->
+  <path d="M26,37 L26,10 L38,10 C39,10 40,11 40,12 L40,37 Z" fill="white" opacity="0.62"/>
+  <!-- Spine -->
+  <rect x="21.5" y="10" width="5" height="27" rx="1.5" fill="#E0E7FF"/>
+  <!-- Lines -->
+  <line x1="11" y1="18" x2="20" y2="18" stroke="#4338CA" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+  <line x1="11" y1="23" x2="20" y2="23" stroke="#4338CA" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+  <line x1="11" y1="28" x2="17" y2="28" stroke="#4338CA" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+</svg>

@@ -139,21 +139,70 @@ function parseJSON(text) {
 }
 
 function parseCSV(text) {
-  const lines = text.replace(/^\uFEFF/, '').split('\n').filter(l => l.trim())
-  if (lines.length < 2) return []
-  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim())
+  // Bỏ BOM nếu có (Excel thêm vào khi save)
+  const clean = text.replace(/^\uFEFF/, '')
+  const lines  = clean.split(/\r?\n/).filter(l => l.trim())
+  if (lines.length < 2) throw new Error('File CSV không có dữ liệu')
+
+  // Parse header
+  const headers = parseCSVLine(lines[0])
+
   return lines.slice(1).map(line => {
-    const cells = line.match(/(".*?"|[^,]+|(?<=,)(?=,)|^(?=,)|(?<=,)$)/g) || []
-    const clean = cells.map(c => c.replace(/^"|"$/g, '').replace(/""/g, '"').trim())
-    const obj = {}; headers.forEach((h, i) => obj[h] = clean[i] || '')
-    return {
-      id: crypto.randomUUID(), word: obj['Word'] || '', phonetic: obj['Phonetic'] || null,
-      definitionVi: obj['Nghĩa VI'] || null, definitionEn: obj['Nghĩa EN'] || null, example: obj['Ví dụ'] || null,
-      tags: obj['Tags'] ? obj['Tags'].split(';').map(t => t.trim()).filter(Boolean) : [],
-      sourceLesson: obj['Bài học'] || null, createdAt: new Date().toISOString(),
-      nextReviewAt: new Date(Date.now() + 86400000).toISOString(), intervalDays: 1, easeFactor: 2.5, reviewCount: 0, lastRating: null
+    const cells = parseCSVLine(line)
+    const get   = (colName) => {
+      const idx = headers.indexOf(colName)
+      return idx >= 0 ? (cells[idx] || '').trim() : ''
     }
-  }).filter(w => w.word)
+
+    const word = get('Word')
+    if (!word) return null
+
+    return {
+      id:           crypto.randomUUID(),
+      word,
+      phonetic:     get('Phonetic')  || null,
+      definitionVi: get('Nghĩa VI')  || null,
+      definitionEn: get('Nghĩa EN')  || null,
+      example:      get('Ví dụ')     || null,
+      tags:         get('Tags') ? get('Tags').split(';').map(t => t.trim()).filter(Boolean) : [],
+      sourceLesson: get('Bài học')   || null,
+      sourceUrl:    null,
+      createdAt:    new Date().toISOString(),
+      nextReviewAt: new Date(Date.now() + 86400000).toISOString(),
+      intervalDays: 1,
+      easeFactor:   2.5,
+      reviewCount:  0,
+      reviewGoodCount: 0,
+      lastRating:   null
+    }
+  }).filter(Boolean)
+}
+
+// Helper: parse 1 dòng CSV có hỗ trợ quoted fields
+function parseCSVLine(line) {
+  const result = []
+  let current  = ''
+  let inQuotes = false
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i]
+    const next = line[i + 1]
+
+    if (char === '"' && inQuotes && next === '"') {
+      // Escaped quote bên trong field
+      current += '"'
+      i++ // skip next quote
+    } else if (char === '"') {
+      inQuotes = !inQuotes
+    } else if (char === ',' && !inQuotes) {
+      result.push(current)
+      current = ''
+    } else {
+      current += char
+    }
+  }
+  result.push(current) // push field cuối cùng
+  return result
 }
 
 function showImportResult(type, msg) {
