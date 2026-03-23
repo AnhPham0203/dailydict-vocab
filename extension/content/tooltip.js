@@ -1,7 +1,9 @@
 let hideTimer = null
+let isSavedState = false
 
 async function showTooltip(word, anchorRect) {
   clearTimeout(hideTimer)
+  isSavedState = false
 
   // Tạo hoặc tái dùng tooltip element
   let tip = document.getElementById('dd-tooltip')
@@ -10,7 +12,11 @@ async function showTooltip(word, anchorRect) {
     tip.id = 'dd-tooltip'
     document.body.appendChild(tip)
     tip.addEventListener('mouseenter', () => clearTimeout(hideTimer))
-    tip.addEventListener('mouseleave', () => hideTooltipDelayed())
+    tip.addEventListener('mouseleave', () => {
+      // Nếu đang ở saved state → delay lâu hơn nhiều (2 giây)
+      // cho user đủ thời gian đưa chuột vào input tag
+      hideTooltipDelayed(isSavedState ? 2000 : 400)
+    })
   }
 
   // Hiện loading state ngay lập tức
@@ -67,6 +73,10 @@ async function showSavedState(wordId, word) {
   const tip = document.getElementById('dd-tooltip')
   if (!tip) return
 
+  isSavedState = true          // bật flag: đang ở saved state
+  clearTimeout(hideTimer)       // hủy bất kỳ timer ẩn nào đang chạy
+  tip.style.minHeight = '140px' // giữ kích thước tooltip không bị co lại đột ngột
+
   const wordData = await window.DailyDictStorage.getWordById(wordId)
   const existingTags = wordData?.tags || []
 
@@ -80,11 +90,13 @@ async function showSavedState(wordId, word) {
             <button class="dd-tag-remove" data-tag="${t}" data-word="${wordId}">×</button>
           </span>`).join('')}
       </div>
-      <div style="position:relative">
+      <div style="position:relative; display:flex; gap:6px;">
         <input type="text" id="dd-tag-input"
                class="dd-tag-input"
+               style="flex:1;"
                placeholder="+ Thêm tag (vd: IELTS, Bài 14)..."
                autocomplete="off" maxlength="30">
+        <button id="dd-tag-add-btn" class="dd-tag-add-btn">+</button>
         <div class="dd-tag-suggestions" id="dd-tag-sugg" style="display:none"></div>
       </div>
     </div>`
@@ -93,6 +105,18 @@ async function showSavedState(wordId, word) {
   const sugg = document.getElementById('dd-tag-sugg')
 
   input.focus()
+
+  // Bind nút "+ Thêm" — fallback khi Enter bị trang chặn
+  document.getElementById('dd-tag-add-btn')?.addEventListener('click', async (e) => {
+    e.stopPropagation()
+    const val = input.value.trim()
+    if (!val) return
+    await window.DailyDictStorage.addTagToWord(wordId, val)
+    input.value = ''
+    sugg.style.display = 'none'
+    refreshTagsDisplay(wordId)
+    input.focus()
+  })
 
   input.addEventListener('input', async () => {
     const q = input.value.trim().toLowerCase()
@@ -116,9 +140,12 @@ async function showSavedState(wordId, word) {
     sugg.style.width = inputRect.width + 'px'
   })
 
+  // Dùng capture: true để bắt event TRƯỚC khi trang nhận
+  // -> giải quyết trường hợp trang (DailyDictation) chặn Enter bằng document keydown
   input.addEventListener('keydown', async (e) => {
     if (e.key === 'Enter') {
       e.preventDefault()
+      e.stopPropagation() // ngăn event bubble lên trang
       const val = input.value.trim()
       if (!val) return
       await window.DailyDictStorage.addTagToWord(wordId, val)
@@ -126,7 +153,7 @@ async function showSavedState(wordId, word) {
       sugg.style.display = 'none'
       refreshTagsDisplay(wordId)
     }
-  })
+  }, { capture: true })
 
   sugg.addEventListener('click', async (e) => {
     const item = e.target.closest('.dd-sugg-item')
@@ -269,7 +296,10 @@ function hideTooltipDelayed(delay = 400) {
     if (tip) {
       tip.classList.remove('dd-visible')
       setTimeout(() => {
-        if (!tip.classList.contains('dd-visible')) tip.remove()
+        if (!tip.classList.contains('dd-visible')) {
+          tip.remove()
+          isSavedState = false
+        }
       }, 200)
     }
   }, delay)
