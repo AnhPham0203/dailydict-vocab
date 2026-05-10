@@ -10,33 +10,32 @@
   <link rel="stylesheet" href="style.css">
   <style>
     .controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
-    .sort-select { 
-      padding: var(--space-2) var(--space-3); 
-      border: 1px solid var(--c-border); 
-      border-radius: var(--radius-md); 
-      font-size: var(--text-sm); 
+    .sort-select {
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
       background: var(--c-surface);
       color: var(--c-text-2);
       outline: none;
       font-family: var(--font-main);
     }
     .sort-select:focus { border-color: var(--c-primary); }
-    
-    .word-detail { 
-      display: none; 
-      padding: var(--space-4) var(--space-5); 
-      background: var(--c-surface-2); 
+
+    .word-detail {
+      display: none;
+      padding: var(--space-4) var(--space-5);
+      background: var(--c-surface-2);
       border-top: 1px solid var(--c-border);
       border-radius: 0 0 var(--radius-lg) var(--radius-lg);
       margin-top: -1px;
       margin-bottom: var(--space-3);
     }
-    
+
     .word-row-group { margin-bottom: var(--space-3); }
     .word-row-group .word-row { border-radius: var(--radius-lg); }
     .word-row-group.expanded .word-row { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
 
-    /* v1.3: Filter Bar & Bulk styles */
     .filter-bar {
       background: var(--c-surface);
       border: 1px solid var(--c-border);
@@ -74,7 +73,7 @@
     }
     .filter-chip:hover { border-color: var(--c-primary); color: var(--c-primary); }
     .filter-chip--active { background: var(--c-primary); border-color: var(--c-primary); color: white; }
-    
+
     .filter-select {
       padding: var(--space-1) var(--space-3);
       border-radius: var(--radius-md);
@@ -106,7 +105,7 @@
 
     .bulk-toolbar {
       position: sticky;
-      top: 70px;
+      top: 0;
       background: var(--c-text-1);
       color: white;
       border-radius: var(--radius-lg);
@@ -146,108 +145,128 @@
   </style>
 </head>
 <body>
-  <header class="app-header">
-    <div class="header-inner">
-      <a href="index.html" class="header-brand">
-        <span class="brand-icon">←</span>
-        <span class="brand-name">Dashboard</span>
-      </a>
-      <h1 id="total-count" style="font-size: var(--text-base); font-weight: var(--weight-semi); color: var(--c-text-1);">0 từ vựng</h1>
-      <div style="display: flex; gap: 8px;">
+
+<div class="app-shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="sidebar-logo__icon">◆</span>
+      <span class="sidebar-logo__name">DailyDict</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item" data-page="home"><i class="sidebar-nav__icon">⌂</i><span>Trang chủ</span></a>
+      <a href="words.html" class="nav-item" data-page="words"><i class="sidebar-nav__icon">☰</i><span>Từ vựng</span><span class="nav-badge" id="nav-total-badge" style="display:none"></span></a>
+      <a href="review.html" class="nav-item nav-item--primary" data-page="review"><i class="sidebar-nav__icon">⟳</i><span>Ôn tập</span><span class="nav-badge nav-badge--alert" id="nav-due-badge" style="display:none"></span></a>
+      <a href="writing.html" class="nav-item" data-page="writing"><i class="sidebar-nav__icon">✎</i><span>Writing</span></a>
+      <a href="quiz.html" class="nav-item" data-page="quiz"><i class="sidebar-nav__icon">◎</i><span>Quiz</span></a>
+      <a href="exercise.html" class="nav-item" data-page="exercise"><i class="sidebar-nav__icon">⊞</i><span>Bài tập</span></a>
+    </nav>
+    <div class="sidebar-section-label">BỘ SƯU TẬP</div>
+    <nav class="sidebar-nav">
+      <a href="tags.html" class="nav-item" data-page="tags"><i class="sidebar-nav__icon">⊡</i><span>Tags</span></a>
+      <a href="achievements.html" class="nav-item" data-page="achievements"><i class="sidebar-nav__icon">★</i><span>Thành tích</span><span class="nav-dot" id="nav-badge-dot" style="display:none"></span></a>
+      <a href="export.html" class="nav-item" data-page="export"><i class="sidebar-nav__icon">↑</i><span>Export / Import</span></a>
+    </nav>
+    <div class="sidebar-streak" id="sidebar-streak">
+      <span class="sidebar-streak__fire">🔥</span>
+      <div>
+        <div class="sidebar-streak__num" id="sidebar-streak-num">0</div>
+        <div class="sidebar-streak__label">ngày liên tiếp</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="app-right">
+    <div class="mobile-topbar">
+      <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+      <span style="font-size:15px;font-weight:700;color:var(--c-text-1);">Từ vựng</span>
+      <span></span>
+    </div>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1 class="page-title" id="total-count">0 từ vựng</h1>
         <button class="btn-sm-primary" id="btn-toggle-select" style="background: var(--c-surface); color: var(--c-text-2); border: 1px solid var(--c-border);">☑ Chọn nhiều</button>
       </div>
-    </div>
-  </header>
 
-  <div class="container">
-    <!-- Bulk Toolbar -->
-    <div class="bulk-toolbar" id="bulk-toolbar" style="display:none">
-      <span id="bulk-count" style="font-size: var(--text-sm); font-weight: var(--weight-semi);">0 đã chọn</span>
-      <div class="bulk-actions">
-        <button class="bulk-btn" id="btn-bulk-tag">🏷️ Tag</button>
-        <button class="bulk-btn bulk-btn--danger" id="btn-bulk-delete">🗑 Xoá</button>
-        <button class="bulk-btn" id="btn-deselect-all">✕ Huỷ</button>
-      </div>
-    </div>
-
-    <div class="search-wrap">
-      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
-        <path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-      <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm từ vựng hoặc nghĩa...">
-    </div>
-
-    <!-- BUG-03: Data Actions (Export/Import) -->
-    <div class="data-actions" style="display:flex; gap:8px; margin-bottom: 16px;">
-      <button id="btn-export-json" class="cta-secondary" style="flex:1; justify-content:center;">
-        ⬇️ Xuất dữ liệu (JSON)
-      </button>
-      <label class="cta-secondary" style="flex:1; justify-content:center; cursor:pointer;">
-        ⬆️ Nhập dữ liệu (JSON)
-        <input type="file" id="import-file-json" accept=".json" style="display:none;">
-      </label>
-    </div>
-
-    <!-- Filter Bar -->
-    <div class="filter-bar" id="filter-bar">
-      <div class="filter-group">
-        <span class="filter-group__label">Tag</span>
-        <div class="filter-chips" id="filter-tags">
-          <button class="filter-chip filter-chip--active" data-tag="all">Tất cả</button>
-          <!-- Tags will be injected here -->
+      <!-- Bulk Toolbar -->
+      <div class="bulk-toolbar" id="bulk-toolbar" style="display:none">
+        <span id="bulk-count" style="font-size: var(--text-sm); font-weight: var(--weight-semi);">0 đã chọn</span>
+        <div class="bulk-actions">
+          <button class="bulk-btn" id="btn-bulk-tag">🏷️ Tag</button>
+          <button class="bulk-btn bulk-btn--danger" id="btn-bulk-delete">🗑 Xoá</button>
+          <button class="bulk-btn" id="btn-deselect-all">✕ Huỷ</button>
         </div>
       </div>
-      <div class="filter-group">
-        <span class="filter-group__label">Trạng thái</span>
-        <div class="filter-chips" id="filter-rating">
-          <button class="filter-chip filter-chip--active" data-rating="all">Tất cả</button>
-          <button class="filter-chip" data-rating="new">🌱 Mới</button>
-          <button class="filter-chip" data-rating="again">😅 Quên</button>
-          <button class="filter-chip" data-rating="hard">😓 Khó</button>
-          <button class="filter-chip" data-rating="good">😊 Nhớ</button>
-          <button class="filter-chip" data-rating="easy">🎯 Dễ</button>
+
+      <div class="search-wrap">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm từ vựng hoặc nghĩa...">
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar" id="filter-bar">
+        <div class="filter-group">
+          <span class="filter-group__label">Tag</span>
+          <div class="filter-chips" id="filter-tags">
+            <button class="filter-chip filter-chip--active" data-tag="all">Tất cả</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <span class="filter-group__label">Trạng thái</span>
+          <div class="filter-chips" id="filter-rating">
+            <button class="filter-chip filter-chip--active" data-rating="all">Tất cả</button>
+            <button class="filter-chip" data-rating="new">🌱 Mới</button>
+            <button class="filter-chip" data-rating="again">😅 Quên</button>
+            <button class="filter-chip" data-rating="hard">😓 Khó</button>
+            <button class="filter-chip" data-rating="good">😊 Nhớ</button>
+            <button class="filter-chip" data-rating="easy">🎯 Dễ</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <span class="filter-group__label">Bài học</span>
+          <select class="filter-select" id="filter-source">
+            <option value="all">Tất cả bài</option>
+          </select>
+        </div>
+        <div class="filter-summary" id="filter-summary" style="display:none">
+          <span id="filter-result-count" style="font-size: var(--text-sm); font-weight: var(--weight-semi); color: var(--c-text-2);">0 từ</span>
+          <button class="filter-clear-btn" id="btn-clear-filters">✕ Xoá bộ lọc</button>
         </div>
       </div>
-      <div class="filter-group">
-        <span class="filter-group__label">Bài học</span>
-        <select class="filter-select" id="filter-source">
-          <option value="all">Tất cả bài</option>
+
+      <div class="controls">
+        <h2 class="section-heading" style="margin-bottom: 0;">Danh sách từ</h2>
+        <select id="sort-select" class="sort-select">
+          <option value="newest">Mới nhất</option>
+          <option value="oldest">Cũ nhất</option>
+          <option value="az">A - Z</option>
+          <option value="due">Cần ôn tập trước</option>
         </select>
       </div>
-      <div class="filter-summary" id="filter-summary" style="display:none">
-        <span id="filter-result-count" style="font-size: var(--text-sm); font-weight: var(--weight-semi); color: var(--c-text-2);">0 từ</span>
-        <button class="filter-clear-btn" id="btn-clear-filters">✕ Xoá bộ lọc</button>
-      </div>
-    </div>
-    
-    <div class="controls">
-      <h2 class="section-heading" style="margin-bottom: 0;">Danh sách từ</h2>
-      <select id="sort-select" class="sort-select">
-        <option value="newest">Mới nhất</option>
-        <option value="oldest">Cũ nhất</option>
-        <option value="az">A - Z</option>
-        <option value="due">Cần ôn tập trước</option>
-      </select>
-    </div>
 
-    <div id="word-list-container" class="word-list">
-      <!-- Word rows will be injected here -->
-    </div>
+      <div id="word-list-container" class="word-list"></div>
 
-    <div id="empty-state" class="empty-state" style="display: none;">
-      <div class="empty-state__circle">
-        <span class="empty-state__icon">📔</span>
+      <div id="empty-state" class="empty-state" style="display: none;">
+        <div class="empty-state__circle">
+          <span class="empty-state__icon">📔</span>
+        </div>
+        <h3 class="empty-state__title">Không tìm thấy từ nào</h3>
+        <p class="empty-state__desc">Thử thay đổi bộ lọc hoặc tìm kiếm từ khác.</p>
+        <button class="empty-state__cta" id="btn-reset-empty" style="background:none; cursor:pointer;">Xoá bộ lọc</button>
       </div>
-      <h3 class="empty-state__title">Không tìm thấy từ nào</h3>
-      <p class="empty-state__desc">Thử thay đổi bộ lọc hoặc tìm kiếm từ khác.</p>
-      <button class="empty-state__cta" id="btn-reset-empty" style="background:none; cursor:pointer;">Xoá bộ lọc</button>
-    </div>
+    </main>
   </div>
+</div>
 
-  <script src="../shared/tags.js"></script>
-  <script src="../shared/storage.js"></script>
-  <script src="app.js"></script>
-  <script src="words-app.js"></script>
+<script src="../shared/tags.js"></script>
+<script src="../shared/storage.js"></script>
+<script src="sidebar.js"></script>
+<script src="app.js"></script>
+<script src="words-app.js"></script>
 </body>
 </html>

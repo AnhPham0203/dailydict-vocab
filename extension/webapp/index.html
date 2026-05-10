@@ -3,152 +3,231 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — DailyDict Vocab</title>
+  <title>DailyDict Vocab</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="app-header">
-    <div class="header-inner">
-      <a href="index.html" class="header-brand">
-        <span class="brand-icon">◆</span>
-        <span class="brand-name">DailyDict Vocab</span>
-      </a>
-      <nav class="header-nav">
-        <a href="words.html" class="nav-link">Từ vựng</a>
-        <a href="tags.html" class="nav-link">Tags</a>
-        <a href="achievements.html" class="nav-link">Thành tích</a>
-        <a href="export.html" class="nav-link">Dữ liệu</a>
-        <a href="review.html" class="nav-link nav-link--cta">Ôn tập</a>
-      </nav>
+
+<div class="app-shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="sidebar-logo__icon">◆</span>
+      <span class="sidebar-logo__name">DailyDict</span>
     </div>
-  </header>
-
-  <div class="container">
-    <!-- Stats Layout -->
-    <div class="stats-layout">
-      <!-- Stat chính: Streak -->
-      <div class="stat-hero">
-        <div class="stat-hero__icon">🔥</div>
-        <div id="stat-streak" class="stat-hero__number">0</div>
-        <div class="stat-hero__label">ngày liên tiếp</div>
-      </div>
-
-      <!-- 4 stat phụ -->
-      <div class="stats-grid-3" style="grid-template-rows: repeat(4, 1fr);">
-        <div class="stat-item">
-          <div id="stat-total" class="stat-item__number">0</div>
-          <div class="stat-item__label">Tổng số từ</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-item__number"><span id="stat-retention">0</span><span class="stat-item__unit">%</span></div>
-          <div class="stat-item__label">Tỷ lệ nhớ</div>
-        </div>
-        <div class="stat-item">
-          <div id="stat-due" class="stat-item__number">0</div>
-          <div class="stat-item__label">Cần ôn tập</div>
-        </div>
-        <div class="stat-item">
-          <div id="stat-longest-streak" class="stat-item__number">0</div>
-          <div class="stat-item__label">Streak dài nhất</div>
-        </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item" data-page="home"><i class="sidebar-nav__icon">⌂</i><span>Trang chủ</span></a>
+      <a href="words.html" class="nav-item" data-page="words"><i class="sidebar-nav__icon">☰</i><span>Từ vựng</span><span class="nav-badge" id="nav-total-badge" style="display:none"></span></a>
+      <a href="review.html" class="nav-item nav-item--primary" data-page="review"><i class="sidebar-nav__icon">⟳</i><span>Ôn tập</span><span class="nav-badge nav-badge--alert" id="nav-due-badge" style="display:none"></span></a>
+      <a href="writing.html" class="nav-item" data-page="writing"><i class="sidebar-nav__icon">✎</i><span>Writing</span></a>
+      <a href="quiz.html" class="nav-item" data-page="quiz"><i class="sidebar-nav__icon">◎</i><span>Quiz</span></a>
+      <a href="exercise.html" class="nav-item" data-page="exercise"><i class="sidebar-nav__icon">⊞</i><span>Bài tập</span></a>
+    </nav>
+    <div class="sidebar-section-label">BỘ SƯU TẬP</div>
+    <nav class="sidebar-nav">
+      <a href="tags.html" class="nav-item" data-page="tags"><i class="sidebar-nav__icon">⊡</i><span>Tags</span></a>
+      <a href="achievements.html" class="nav-item" data-page="achievements"><i class="sidebar-nav__icon">★</i><span>Thành tích</span><span class="nav-dot" id="nav-badge-dot" style="display:none"></span></a>
+      <a href="export.html" class="nav-item" data-page="export"><i class="sidebar-nav__icon">↑</i><span>Export / Import</span></a>
+    </nav>
+    <div class="sidebar-streak" id="sidebar-streak">
+      <span class="sidebar-streak__fire">🔥</span>
+      <div>
+        <div class="sidebar-streak__num" id="sidebar-streak-num">0</div>
+        <div class="sidebar-streak__label">ngày liên tiếp</div>
       </div>
     </div>
+  </aside>
 
-    <!-- Daily Goal Section (v1.2) -->
-    <div class="goal-ring-wrap" id="goal-ring-wrap">
-      <svg class="goal-ring" viewBox="0 0 80 80" width="80" height="80">
-        <circle class="ring-track" cx="40" cy="40" r="32" stroke-width="6"/>
-        <circle class="ring-progress" cx="40" cy="40" r="32" stroke-width="6"
-                stroke-linecap="round" transform="rotate(-90 40 40)"
-                id="ring-progress" stroke-dasharray="201.06" stroke-dashoffset="201.06"/>
-        <text x="40" y="36" text-anchor="middle" class="ring-num" id="ring-num">0</text>
-        <text x="40" y="50" text-anchor="middle" class="ring-label" id="ring-label">/ 10</text>
-      </svg>
-      <div class="goal-ring-meta">
-        <span class="goal-ring-title">Mục tiêu hôm nay</span>
-        <button class="goal-edit-btn" id="btn-edit-goal">Chỉnh sửa mục tiêu</button>
-      </div>
+  <div class="app-right">
+    <div class="mobile-topbar">
+      <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+      <span style="font-size:15px;font-weight:700;color:var(--c-text-1);">DailyDict</span>
+      <span></span>
     </div>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <!-- Goal Setter Modal (v1.2) -->
-    <div id="goal-setter" class="goal-setter" style="display:none">
-      <div class="goal-setter__inner">
-        <p class="goal-setter__label">Số từ mục tiêu mỗi ngày</p>
-        <div class="goal-options">
-          <button class="goal-opt" data-val="5">5</button>
-          <button class="goal-opt" data-val="10">10</button>
-          <button class="goal-opt" data-val="15">15</button>
-          <button class="goal-opt" data-val="20">20</button>
-          <button class="goal-opt" data-val="30">30</button>
+    <main class="main-content">
+
+      <!-- Search bar -->
+      <div class="search-bar">
+        <span class="search-bar__icon">⌕</span>
+        <input type="text" class="search-bar__input"
+               id="search-input"
+               placeholder="Tìm kiếm từ vựng..."
+               autocomplete="off">
+      </div>
+
+      <!-- Stats row -->
+      <div class="dash-stats">
+        <div class="dash-stat">
+          <div class="dash-stat__num accent" id="stat-total">0</div>
+          <div class="dash-stat__label">Tổng từ vựng</div>
         </div>
-        <div class="goal-custom-row">
-          <input type="number" id="goal-custom-input" min="1" max="100" placeholder="Tự nhập..." class="goal-custom-input">
-          <button class="goal-save-btn" id="btn-save-goal">Lưu</button>
+        <div class="dash-stat">
+          <div class="dash-stat__num streak" id="stat-streak">0</div>
+          <div class="dash-stat__label">Ngày liên tiếp</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat__num success" id="stat-retention">0%</div>
+          <div class="dash-stat__label">Tỷ lệ nhớ</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat__num warning" id="stat-due">0</div>
+          <div class="dash-stat__label">Cần ôn tập</div>
         </div>
       </div>
-    </div>
 
-    <!-- Heatmap Section (v1.2) -->
-    <section class="heatmap-section">
-      <div class="section-header">
-        <h2 class="section-heading" style="margin-bottom: 0;">Lịch học tập</h2>
-        <span class="heatmap-total" id="heatmap-total">0 từ trong năm qua</span>
-      </div>
-      <div class="heatmap-wrap" id="heatmap-wrap">
-        <!-- SVG render bằng JS -->
-      </div>
-      <div class="heatmap-legend">
-        <span class="legend-label">Ít</span>
-        <div class="legend-cells">
-          <div class="legend-cell" style="background:var(--hm-0)"></div>
-          <div class="legend-cell" style="background:var(--hm-1)"></div>
-          <div class="legend-cell" style="background:var(--hm-2)"></div>
-          <div class="legend-cell" style="background:var(--hm-3)"></div>
-          <div class="legend-cell" style="background:var(--hm-4)"></div>
+      <!-- 2-column grid -->
+      <div class="dash-grid">
+
+        <!-- CỘT TRÁI -->
+        <div class="dash-col-left">
+
+          <!-- Goal ring -->
+          <div class="dash-card" id="goal-ring-wrap">
+            <div class="dash-card__header">
+              <span class="dash-card__title">Mục tiêu hôm nay</span>
+              <button class="goal-edit-btn" id="btn-edit-goal">Chỉnh sửa</button>
+            </div>
+            <div class="goal-row">
+              <svg class="goal-ring" viewBox="0 0 80 80" width="72" height="72">
+                <circle class="ring-track" cx="40" cy="40" r="32" fill="none" stroke-width="6"/>
+                <circle class="ring-progress" cx="40" cy="40" r="32" fill="none" stroke-width="6"
+                        stroke-linecap="round" transform="rotate(-90 40 40)" id="ring-progress"/>
+                <text x="40" y="36" text-anchor="middle" class="ring-num" id="ring-num">0</text>
+                <text x="40" y="50" text-anchor="middle" class="ring-label" id="ring-label">/ 10</text>
+              </svg>
+              <div class="goal-text">
+                <div class="goal-text__today" id="goal-today-text">Hôm nay chưa lưu từ nào</div>
+                <div class="goal-text__sub">Bôi đen từ bất kỳ trên DailyDictation</div>
+              </div>
+            </div>
+            <!-- Goal setter inline -->
+            <div id="goal-setter" class="goal-setter" style="display:none">
+              <div class="goal-setter__inner">
+                <p class="goal-setter__label">Số từ mục tiêu mỗi ngày</p>
+                <div class="goal-options">
+                  <button class="goal-opt" data-val="5">5</button>
+                  <button class="goal-opt" data-val="10">10</button>
+                  <button class="goal-opt" data-val="15">15</button>
+                  <button class="goal-opt" data-val="20">20</button>
+                  <button class="goal-opt" data-val="30">30</button>
+                </div>
+                <div class="goal-custom-row">
+                  <input type="number" id="goal-custom-input" min="1" max="100" placeholder="Tự nhập..." class="goal-custom-input">
+                  <button class="goal-save-btn" id="btn-save-goal">Lưu</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bar chart -->
+          <div class="dash-card">
+            <div class="dash-card__header">
+              <span class="dash-card__title">Từ vựng 7 ngày qua</span>
+              <span class="dash-card__meta" id="chart-total-label"></span>
+            </div>
+            <div class="chart-bars" id="chart-bars"></div>
+          </div>
+
+          <!-- CTA buttons -->
+          <div class="dash-cta-grid">
+            <button class="dash-cta dash-cta--primary" id="btn-review">
+              <span class="dash-cta__icon">⟳</span>
+              <div>
+                <div class="dash-cta__label">Bắt đầu ôn tập</div>
+                <div class="dash-cta__sub" id="cta-due-sub">0 từ đến hạn</div>
+              </div>
+            </button>
+            <a href="writing.html" class="dash-cta">
+              <span class="dash-cta__icon">✎</span>
+              <div>
+                <div class="dash-cta__label">Writing</div>
+                <div class="dash-cta__sub">Luyện gõ từ</div>
+              </div>
+            </a>
+            <a href="quiz.html" class="dash-cta">
+              <span class="dash-cta__icon">◎</span>
+              <div>
+                <div class="dash-cta__label">Quiz</div>
+                <div class="dash-cta__sub">Trắc nghiệm</div>
+              </div>
+            </a>
+            <a href="exercise.html" class="dash-cta">
+              <span class="dash-cta__icon">⊞</span>
+              <div>
+                <div class="dash-cta__label">Bài tập</div>
+                <div class="dash-cta__sub">Word scramble</div>
+              </div>
+            </a>
+          </div>
+
         </div>
-        <span class="legend-label">Nhiều</span>
+
+        <!-- CỘT PHẢI -->
+        <div class="dash-col-right">
+
+          <!-- Word of day -->
+          <div class="dash-card" id="word-of-day-card">
+            <div class="dash-card__header">
+              <span class="dash-card__title">Từ cần ôn tiếp theo</span>
+            </div>
+            <div class="wod-word" id="wod-word">—</div>
+            <div class="wod-phonetic" id="wod-phonetic"></div>
+            <div class="wod-vi" id="wod-vi"></div>
+            <div class="wod-en" id="wod-en"></div>
+            <div class="wod-example" id="wod-example" style="display:none"></div>
+            <div class="wod-footer">
+              <span class="wod-source" id="wod-source"></span>
+              <a href="review.html" class="btn-primary-sm">Ôn tập →</a>
+            </div>
+          </div>
+
+          <!-- Due list -->
+          <div class="dash-card">
+            <div class="dash-card__header">
+              <span class="dash-card__title">Cần ôn hôm nay</span>
+              <a href="words.html" class="dash-card__link">Xem tất cả</a>
+            </div>
+            <div id="due-list" class="due-list"></div>
+            <div id="due-empty" class="due-empty" style="display:none">
+              🎉 Không có từ nào cần ôn hôm nay!
+            </div>
+          </div>
+
+          <!-- Heatmap -->
+          <div class="dash-card">
+            <div class="dash-card__header">
+              <span class="dash-card__title">Lịch học tập</span>
+              <span class="dash-card__meta" id="heatmap-total"></span>
+            </div>
+            <div class="heatmap-wrap" id="heatmap-wrap"></div>
+            <div class="heatmap-legend">
+              <span class="legend-label">Ít</span>
+              <div class="legend-cells">
+                <div class="legend-cell" style="background:var(--hm-0)"></div>
+                <div class="legend-cell" style="background:var(--hm-1)"></div>
+                <div class="legend-cell" style="background:var(--hm-2)"></div>
+                <div class="legend-cell" style="background:var(--hm-3)"></div>
+                <div class="legend-cell" style="background:var(--hm-4)"></div>
+              </div>
+              <span class="legend-label">Nhiều</span>
+            </div>
+          </div>
+
+        </div>
       </div>
-    </section>
 
-    <!-- Due Words Preview -->
-    <h2 class="section-heading">Từ cần ôn tập hôm nay</h2>
-    <div id="due-list" class="word-list">
-      <!-- Words will be injected here -->
-    </div>
-
-    <!-- CTA Section -->
-    <div class="cta-section">
-      <button class="cta-primary" id="btn-start-review">
-        <span class="cta-primary__label">Bắt đầu ôn tập</span>
-        <span class="cta-primary__badge" id="due-count-badge">Flashcard</span>
-      </button>
-
-      <div class="cta-secondary-row">
-        <a href="writing.html" class="cta-secondary" id="btn-start-writing">
-          <span class="cta-icon">✍️</span>
-          <span>Writing</span>
-        </a>
-        <a href="quiz.html" class="cta-secondary" id="btn-start-quiz">
-          <span class="cta-icon">🎯</span>
-          <span>Quiz</span>
-        </a>
-        <a href="words.html" class="cta-secondary">
-          <span class="cta-icon">📚</span>
-          <span>Tất cả từ</span>
-        </a>
-        <a href="exercise.html" class="cta-secondary">
-          <span class="cta-icon">📝</span>
-          <span>Bài tập</span>
-        </a>
-      </div>
-    </div>
+    </main>
   </div>
+</div>
 
-  <script src="../shared/badges.js"></script>
-  <script src="../shared/storage.js"></script>
-  <script src="app.js"></script>
+<script src="../shared/badges.js"></script>
+<script src="../shared/storage.js"></script>
+<script src="sidebar.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

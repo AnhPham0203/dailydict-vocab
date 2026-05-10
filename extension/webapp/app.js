@@ -1,6 +1,6 @@
 // --- SHARED UTILS ---
 function showGlobalError(message = 'Đã xảy ra lỗi. Vui lòng thử tải lại trang.') {
-  const container = document.querySelector('.container')
+  const container = document.querySelector('.main-content') || document.querySelector('.container')
   if (!container) return
   container.innerHTML = `
     <div class="empty-state" style="padding: 80px 20px;">
@@ -35,26 +35,28 @@ async function initDashboard() {
     const stats = await window.DailyDictStorage.getStats(), words = await window.DailyDictStorage.getWords(), dueToday = await window.DailyDictStorage.getWordsDueToday()
     document.getElementById('stat-streak').textContent = stats.streak
     document.getElementById('stat-total').textContent = stats.total
-    document.getElementById('stat-retention').textContent = stats.retentionRate
+    document.getElementById('stat-retention').textContent = stats.retentionRate + '%'
     document.getElementById('stat-due').textContent = stats.dueCount
-    
-    // BUG-08: Longest Streak
-    const longestStreak = await window.DailyDictStorage.getLongestStreak()
-    const longestStreakEl = document.getElementById('stat-longest-streak')
-    if (longestStreakEl) longestStreakEl.textContent = longestStreak
 
-    renderChart(words); renderDueList(dueToday); renderGoalRing(); renderHeatmap(); checkStreakWarning(); checkNewBadges(); initGoalSetter()
+    renderChart(words); renderDueList(dueToday); renderWordOfDay(dueToday); renderGoalRing(); renderHeatmap(); checkStreakWarning(); checkNewBadges(); initGoalSetter()
 
     // FIX-01: Milestone Toast on Load
     const settings = await window.DailyDictStorage.getSettings()
     checkMilestoneOnLoad(stats.streak, settings)
 
-    const btn = document.getElementById('btn-start-review'), badge = document.getElementById('due-count-badge')
+    const btn = document.getElementById('btn-review')
+    const ctaSub = document.getElementById('cta-due-sub')
     if (btn) {
-      if (badge) badge.textContent = `${dueToday.length} từ đến hạn`
+      if (ctaSub) ctaSub.textContent = `${dueToday.length} từ đến hạn`
       btn.addEventListener('click', () => { window.location.href = 'review.html' })
       if (dueToday.length === 0) { btn.disabled = true; btn.classList.add('cta-primary--empty') }
     }
+
+    document.getElementById('search-input')?.addEventListener('input', debounce((e) => {
+      const q = e.target.value.trim()
+      if (q.length < 2) return
+      window.location.href = `words.html?search=${encodeURIComponent(q)}`
+    }, 600))
   } catch (err) { console.error('Dashboard init error:', err); showGlobalError() }
 }
 
@@ -71,11 +73,34 @@ function renderChart(words) {
 }
 
 function renderDueList(dueWords) {
-  const list = document.getElementById('due-list'); if (!list) return
+  const list  = document.getElementById('due-list');  if (!list) return
+  const empty = document.getElementById('due-empty')
   if (dueWords.length === 0) {
-    list.innerHTML = `<div class="empty-state"><div class="empty-state__circle"><span class="empty-state__icon">📖</span></div><h3 class="empty-state__title">Chưa có từ nào cần ôn</h3></div>`; return
+    list.innerHTML = ''
+    if (empty) empty.style.display = 'block'
+    return
   }
-  list.innerHTML = dueWords.slice(0, 5).map(w => `<div class="word-row"><div class="word-row__main"><span class="word-row__word">${w.word}</span><span class="word-row__phonetic">${w.phonetic || ''}</span></div><div class="word-row__vi">${w.definitionVi || ''}</div><div class="word-row__actions"><span class="status-pill ${getPillClass(w.lastRating)}">${getPillLabel(w.lastRating)}</span></div></div>`).join('')
+  if (empty) empty.style.display = 'none'
+  list.innerHTML = dueWords.slice(0, 5).map(w => `
+    <div class="due-row">
+      <span class="due-row__word">${w.word}</span>
+      <span class="due-row__vi">${w.definitionVi || ''}</span>
+      <span class="status-pill ${getPillClass(w.lastRating)}">${getPillLabel(w.lastRating)}</span>
+    </div>`).join('')
+}
+
+async function renderWordOfDay(dueWords) {
+  const card = document.getElementById('word-of-day-card'); if (!card) return
+  if (!dueWords || dueWords.length === 0) { card.style.display = 'none'; return }
+  const word = dueWords.find(w => w.lastRating === 'again') || dueWords[0]
+  document.getElementById('wod-word').textContent     = word.word
+  document.getElementById('wod-phonetic').textContent = word.phonetic || ''
+  document.getElementById('wod-vi').textContent       = word.definitionVi || ''
+  document.getElementById('wod-en').textContent       = word.definitionEn || ''
+  const exEl = document.getElementById('wod-example')
+  if (exEl) { exEl.textContent = word.example ? `"${word.example}"` : ''; exEl.style.display = word.example ? 'block' : 'none' }
+  const srcEl = document.getElementById('wod-source')
+  if (srcEl) srcEl.textContent = word.sourceLesson ? `📌 ${word.sourceLesson}` : ''
 }
 
 async function renderGoalRing() {
@@ -163,7 +188,8 @@ async function checkStreakWarning() {
     const banner = document.createElement('div')
     banner.className = 'streak-warning'
     banner.innerHTML = `<span class="streak-warning__icon">⚠️</span><div class="streak-warning__text"><strong>Streak ${streak} ngày sắp bị mất!</strong><span>Lưu ít nhất 1 từ trước nửa đêm để giữ chuỗi.</span></div><a href="https://dailydictation.com" target="_blank" class="streak-warning__cta">Học ngay →</a>`
-    document.querySelector('.app-header').insertAdjacentElement('afterend', banner)
+    const anchor = document.querySelector('.main-content') || document.querySelector('.app-header')
+    anchor?.insertAdjacentElement('afterbegin', banner)
   }
 
   await _doCheck()

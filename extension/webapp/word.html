@@ -61,71 +61,108 @@
   </style>
 </head>
 <body>
-  <header class="app-header">
-    <div class="header-inner">
-      <a href="words.html" class="header-brand">
-        <span class="brand-icon">←</span>
-        <span class="brand-name">Tất cả từ</span>
-      </a>
-      <span class="header-title" id="detail-word-title" style="font-weight: 700; color: var(--c-text-1);">...</span>
-      <button class="btn-icon--danger" id="btn-delete-word" title="Xoá từ này">🗑</button>
-    </div>
-  </header>
 
-  <div class="container" style="max-width: 600px;">
-    <div class="word-hero">
-      <h1 class="word-hero__word" id="detail-word">...</h1>
-      <div class="word-hero__phonetic" id="detail-phonetic">...</div>
-      <button class="word-hero__audio" id="btn-play-audio">🔊 Nghe phát âm</button>
-    </div>
+<div class="app-shell">
 
-    <div class="detail-section">
-      <h2 class="section-heading">Nghĩa của từ</h2>
-      <div class="definition-card">
-        <div class="def-vi" id="detail-vi">...</div>
-        <div class="def-en" id="detail-en">...</div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="sidebar-logo__icon">◆</span>
+      <span class="sidebar-logo__name">DailyDict</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item" data-page="home"><i class="sidebar-nav__icon">⌂</i><span>Trang chủ</span></a>
+      <a href="words.html" class="nav-item" data-page="words"><i class="sidebar-nav__icon">☰</i><span>Từ vựng</span><span class="nav-badge" id="nav-total-badge" style="display:none"></span></a>
+      <a href="review.html" class="nav-item nav-item--primary" data-page="review"><i class="sidebar-nav__icon">⟳</i><span>Ôn tập</span><span class="nav-badge nav-badge--alert" id="nav-due-badge" style="display:none"></span></a>
+      <a href="writing.html" class="nav-item" data-page="writing"><i class="sidebar-nav__icon">✎</i><span>Writing</span></a>
+      <a href="quiz.html" class="nav-item" data-page="quiz"><i class="sidebar-nav__icon">◎</i><span>Quiz</span></a>
+      <a href="exercise.html" class="nav-item" data-page="exercise"><i class="sidebar-nav__icon">⊞</i><span>Bài tập</span></a>
+    </nav>
+    <div class="sidebar-section-label">BỘ SƯU TẬP</div>
+    <nav class="sidebar-nav">
+      <a href="tags.html" class="nav-item" data-page="tags"><i class="sidebar-nav__icon">⊡</i><span>Tags</span></a>
+      <a href="achievements.html" class="nav-item" data-page="achievements"><i class="sidebar-nav__icon">★</i><span>Thành tích</span><span class="nav-dot" id="nav-badge-dot" style="display:none"></span></a>
+      <a href="export.html" class="nav-item" data-page="export"><i class="sidebar-nav__icon">↑</i><span>Export / Import</span></a>
+    </nav>
+    <div class="sidebar-streak" id="sidebar-streak">
+      <span class="sidebar-streak__fire">🔥</span>
+      <div>
+        <div class="sidebar-streak__num" id="sidebar-streak-num">0</div>
+        <div class="sidebar-streak__label">ngày liên tiếp</div>
       </div>
     </div>
+  </aside>
 
-    <div class="detail-section" id="section-example" style="display:none">
-      <h2 class="section-heading">Ví dụ thực tế</h2>
-      <div class="example-card" id="detail-example">...</div>
+  <div class="app-right">
+    <div class="mobile-topbar">
+      <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+      <span style="font-size:15px;font-weight:700;color:var(--c-text-1);" id="detail-word-title-mobile">...</span>
+      <button class="btn-icon--danger" id="btn-delete-word-mobile" title="Xoá từ này" style="display:none">🗑</button>
     </div>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <div class="detail-section">
-      <h2 class="section-heading">Gán Tags</h2>
-      <div class="detail-tags" id="detail-tags"></div>
-      <div style="position:relative">
-        <input type="text" id="detail-tag-input" class="tag-input-inline" placeholder="+ Thêm tag mới (Enter để lưu)..." autocomplete="off">
-        <div class="dd-tag-suggestions" id="detail-tag-sugg" style="display:none; bottom: auto; top: calc(100% + 4px);"></div>
+    <main class="main-content" style="max-width: 640px;">
+      <div class="page-header">
+        <a href="words.html" class="page-back">← Tất cả từ</a>
+        <span class="page-meta" id="detail-word-title" style="font-weight:700; color:var(--c-text-1);">...</span>
+        <button class="btn-icon--danger" id="btn-delete-word" title="Xoá từ này">🗑</button>
       </div>
-    </div>
 
-    <div class="detail-section">
-      <h2 class="section-heading">Tiến độ ôn tập (SRS)</h2>
-      <div class="srs-stats">
-        <div class="srs-stat">
-          <span class="srs-stat__num" id="stat-reviews">0</span>
-          <span class="srs-stat__label">Lần ôn</span>
-        </div>
-        <div class="srs-stat">
-          <span class="srs-stat__num" id="stat-interval">0</span>
-          <span class="srs-stat__label">Ngày kế</span>
-        </div>
-        <div class="srs-stat">
-          <span class="srs-stat__num" id="stat-ease">0.0</span>
-          <span class="srs-stat__label">Ease</span>
+      <div class="word-hero">
+        <h1 class="word-hero__word" id="detail-word">...</h1>
+        <div class="word-hero__phonetic" id="detail-phonetic">...</div>
+        <button class="word-hero__audio" id="btn-play-audio">🔊 Nghe phát âm</button>
+      </div>
+
+      <div class="detail-section">
+        <h2 class="section-heading">Nghĩa của từ</h2>
+        <div class="definition-card">
+          <div class="def-vi" id="detail-vi">...</div>
+          <div class="def-en" id="detail-en">...</div>
         </div>
       </div>
-    </div>
 
-    <div class="detail-section" id="section-source" style="display:none">
-      <h2 class="section-heading">Nguồn lưu từ</h2>
-      <a class="source-link" id="detail-source-link" target="_blank">...</a>
-    </div>
+      <div class="detail-section" id="section-example" style="display:none">
+        <h2 class="section-heading">Ví dụ thực tế</h2>
+        <div class="example-card" id="detail-example">...</div>
+      </div>
+
+      <div class="detail-section">
+        <h2 class="section-heading">Gán Tags</h2>
+        <div class="detail-tags" id="detail-tags"></div>
+        <div style="position:relative">
+          <input type="text" id="detail-tag-input" class="tag-input-inline" placeholder="+ Thêm tag mới (Enter để lưu)..." autocomplete="off">
+          <div class="dd-tag-suggestions" id="detail-tag-sugg" style="display:none; bottom: auto; top: calc(100% + 4px);"></div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h2 class="section-heading">Tiến độ ôn tập (SRS)</h2>
+        <div class="srs-stats">
+          <div class="srs-stat">
+            <span class="srs-stat__num" id="stat-reviews">0</span>
+            <span class="srs-stat__label">Lần ôn</span>
+          </div>
+          <div class="srs-stat">
+            <span class="srs-stat__num" id="stat-interval">0</span>
+            <span class="srs-stat__label">Ngày kế</span>
+          </div>
+          <div class="srs-stat">
+            <span class="srs-stat__num" id="stat-ease">0.0</span>
+            <span class="srs-stat__label">Ease</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-section" id="section-source" style="display:none">
+        <h2 class="section-heading">Nguồn lưu từ</h2>
+        <a class="source-link" id="detail-source-link" target="_blank">...</a>
+      </div>
+    </main>
   </div>
+</div>
 
-  <script src="../shared/storage.js"></script>
-  <script src="word.js"></script>
+<script src="../shared/storage.js"></script>
+<script src="sidebar.js"></script>
+<script src="word.js"></script>
 </body>
 </html>

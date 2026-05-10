@@ -257,15 +257,6 @@ function showScreen(name) {
   document.getElementById('screen-list').style.display   = name === 'list'   ? 'block' : 'none'
   document.getElementById('screen-game').style.display   = name === 'game'   ? 'block' : 'none'
   document.getElementById('screen-result').style.display = name === 'result' ? 'block' : 'none'
-
-  if (name === 'list') {
-    document.getElementById('header-title').textContent = 'Bài tập'
-    document.getElementById('header-meta').textContent  = ''
-    const backBtn = document.getElementById('back-btn')
-    backBtn.textContent = '← Dashboard'
-    backBtn.href = 'index.html'
-    backBtn.onclick = null
-  }
 }
 
 // ── Init & Events ──
