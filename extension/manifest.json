@@ -13,7 +13,8 @@
       "shared/storage.js",
       "shared/api.js",
       "content/tooltip.js",
-      "content/content.js"
+      "content/content.js",
+      "content/exercise-scraper.js"
     ],
     "css": ["content/tooltip.css"]
   }],

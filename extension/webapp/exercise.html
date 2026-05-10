@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bài tập — DailyDict</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="index.html" class="back-btn" id="back-btn">← Dashboard</a>
+      <span class="header-title" id="header-title">Bài tập</span>
+      <span id="header-meta"></span>
+    </div>
+  </header>
+
+  <!-- MÀN HÌNH 1: DANH SÁCH BÀI -->
+  <div id="screen-list" class="container">
+    <div class="section-heading-wrap">
+      <h2 class="section-heading">Bài tập đã lưu</h2>
+      <span id="exercise-count" class="count-label"></span>
+    </div>
+    <div id="exercise-list" class="exercise-list">
+      <!-- render bằng JS -->
+    </div>
+  </div>
+
+  <!-- MÀN HÌNH 2: WORD SCRAMBLE -->
+  <div id="screen-game" class="container" style="display:none">
+
+    <!-- Progress bar -->
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+
+    <!-- Card câu hỏi -->
+    <div class="scramble-card">
+
+      <!-- Câu hỏi: nghĩa tiếng Việt -->
+      <div class="scramble-question">
+        <div class="scramble-label">Câu tiếng Anh của câu sau là gì?</div>
+        <div class="scramble-vi" id="scramble-vi"></div>
+      </div>
+
+      <!-- Answer area: chỗ thả từ vào -->
+      <div class="answer-area" id="answer-area">
+        <span class="answer-placeholder" id="answer-placeholder">
+          Chọn các từ bên dưới để ghép thành câu tiếng Anh...
+        </span>
+      </div>
+
+      <div class="scramble-divider"></div>
+
+      <!-- Word bank: các từ xáo trộn -->
+      <div class="word-bank" id="word-bank">
+        <!-- render bằng JS -->
+      </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="scramble-actions">
+      <button class="btn-ghost-sm" id="btn-clear">↩ Xóa hết</button>
+      <button class="btn-primary" id="btn-check">Kiểm tra</button>
+    </div>
+
+    <!-- Feedback (ẩn mặc định) -->
+    <div class="scramble-feedback" id="scramble-feedback" style="display:none"></div>
+
+  </div>
+
+  <!-- MÀN HÌNH 3: KẾT QUẢ -->
+  <div id="screen-result" class="container" style="display:none">
+    <div class="result-screen">
+      <div class="result-emoji" id="result-emoji">🎉</div>
+      <h2 class="result-title" id="result-title">Hoàn thành!</h2>
+      <div class="result-score" id="result-score"></div>
+      <div class="result-pct"   id="result-pct"></div>
+      <div class="result-actions">
+        <button class="btn-primary" id="btn-retry">🔄 Làm lại</button>
+        <button class="btn-outline" id="btn-back-list">← Chọn bài khác</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/storage.js"></script>
+  <script src="exercise.js"></script>
+</body>
+</html>

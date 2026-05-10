@@ -443,5 +443,85 @@ window.DailyDictStorage = {
     const words = await this.getWords()
     const today = new Date().toDateString()
     return words.filter(w => new Date(w.createdAt).toDateString() === today).length
+  },
+
+  // --- EXERCISE CRUD (v1.4) ---
+  async saveExercise(exerciseData) {
+    const exercises = await this.getExercises()
+    const sentences = exerciseData.sentences.map(s => ({
+      ...s,
+      words: shuffleArray(
+        s.textEN
+          .replace(/[.,!?;:"']/g, '')
+          .split(' ')
+          .filter(w => w.trim().length > 0)
+      )
+    }))
+    const newExercise = {
+      id: crypto.randomUUID(),
+      title: exerciseData.title,
+      sourceUrl: exerciseData.sourceUrl || null,
+      createdAt: new Date().toISOString(),
+      sentences,
+      playCount: 0,
+      lastPlayedAt: null,
+      bestScore: null
+    }
+    exercises.push(newExercise)
+    await chrome.storage.local.set({ dd_exercises: exercises })
+    return { success: true, exercise: newExercise }
+  },
+
+  async getExercises() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get('dd_exercises', (result) => {
+        const exercises = result.dd_exercises || []
+        resolve([...exercises].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)))
+      })
+    })
+  },
+
+  async getExerciseById(id) {
+    const exercises = await this.getExercises()
+    return exercises.find(e => e.id === id) || null
+  },
+
+  async deleteExercise(id) {
+    const exercises = await this.getExercises()
+    const filtered = exercises.filter(e => e.id !== id)
+    await chrome.storage.local.set({ dd_exercises: filtered })
+  },
+
+  async getExerciseCount() {
+    const exercises = await this.getExercises()
+    return exercises.length
+  },
+
+  async recordPlay(exerciseId) {
+    const exercises = await this.getExercises()
+    const ex = exercises.find(e => e.id === exerciseId)
+    if (!ex) return
+    ex.playCount    = (ex.playCount || 0) + 1
+    ex.lastPlayedAt = new Date().toISOString()
+    await chrome.storage.local.set({ dd_exercises: exercises })
+  },
+
+  async recordScore(exerciseId, scorePct) {
+    const exercises = await this.getExercises()
+    const ex = exercises.find(e => e.id === exerciseId)
+    if (!ex) return
+    if (ex.bestScore === null || scorePct > ex.bestScore) {
+      ex.bestScore = scorePct
+    }
+    await chrome.storage.local.set({ dd_exercises: exercises })
   }
+}
+
+function shuffleArray(arr) {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
 }
