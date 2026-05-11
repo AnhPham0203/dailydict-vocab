@@ -90,6 +90,84 @@
   --hm-4: #3730A3;
 }
 
+/* ══════════════════════════════════════════
+   DARK MODE — override toàn bộ color tokens
+   Trigger: <html data-theme="dark">
+══════════════════════════════════════════ */
+[data-theme="dark"] {
+  --c-primary:       #818CF8;
+  --c-primary-light: #1E1B4B;
+  --c-primary-dim:   #6366F1;
+
+  --c-bg:            #0C0A09;
+  --c-surface:       #1C1917;
+  --c-surface-2:     #292524;
+  --c-border:        #44403C;
+  --c-border-strong: #57534E;
+
+  --c-text-1: #FAFAF9;
+  --c-text-2: #D6D3D1;
+  --c-text-3: #A8A29E;
+  --c-text-4: #78716C;
+
+  --c-success:       #4ADE80;
+  --c-success-bg:    #052E16;
+  --c-warning:       #FCD34D;
+  --c-warning-bg:    #1C1101;
+  --c-danger:        #F87171;
+  --c-danger-bg:     #1C0202;
+
+  --c-streak:        #FB923C;
+  --c-streak-bg:     #1C0A01;
+  --c-gold:          #FDE047;
+  --c-gold-bg:       #1C1200;
+
+  --hm-0: #1C1917;
+  --hm-1: #1E1B4B;
+  --hm-2: #3730A3;
+  --hm-3: #4F46E5;
+  --hm-4: #818CF8;
+}
+
+/* Transition mượt khi switch theme */
+*, *::before, *::after {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
+}
+
+/* Loại trừ các element không cần transition */
+button, a, input, .word-chip, .rating-btn, .answer-chip {
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+}
+
+/* ── Theme Toggle Button ── */
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--c-border);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-text-3);
+  font-family: var(--font-main);
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.theme-toggle-btn:hover {
+  background: var(--c-surface-2);
+  color: var(--c-text-1);
+}
+#theme-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
 /* Reset + Base */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { 

@@ -44,4 +44,53 @@
   menuBtn?.addEventListener('click', () => sidebar?.classList.toggle('open'))
   overlay?.addEventListener('click', () => sidebar?.classList.remove('open'))
 
+  // ── DARK / LIGHT MODE ──
+  const THEME_KEY = 'dd_theme'
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark')
+    } else {
+      document.documentElement.removeAttribute('data-theme')
+    }
+  }
+
+  const savedTheme = localStorage.getItem(THEME_KEY) ||
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+  applyTheme(savedTheme)
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme')
+    const next    = current === 'dark' ? 'light' : 'dark'
+    applyTheme(next)
+    localStorage.setItem(THEME_KEY, next)
+    updateToggleBtn(next)
+  }
+
+  function updateToggleBtn(theme) {
+    const icon  = document.getElementById('theme-icon')
+    const label = document.getElementById('theme-label')
+    if (!icon && !label) return
+    if (theme === 'dark') {
+      if (icon)  icon.textContent  = '☀'
+      if (label) label.textContent = 'Light mode'
+    } else {
+      if (icon)  icon.textContent  = '☽'
+      if (label) label.textContent = 'Dark mode'
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme)
+    updateToggleBtn(savedTheme)
+  })
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem(THEME_KEY)) {
+      const systemTheme = e.matches ? 'dark' : 'light'
+      applyTheme(systemTheme)
+      updateToggleBtn(systemTheme)
+    }
+  })
+
 })()

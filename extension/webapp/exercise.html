@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bài tập — DailyDict</title>
+  <script>(function(){var t=localStorage.getItem("dd_theme")||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");if(t==="dark")document.documentElement.setAttribute("data-theme","dark");}());</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -32,6 +33,7 @@
       <a href="achievements.html" class="nav-item" data-page="achievements"><i class="sidebar-nav__icon">★</i><span>Thành tích</span><span class="nav-dot" id="nav-badge-dot" style="display:none"></span></a>
       <a href="export.html" class="nav-item" data-page="export"><i class="sidebar-nav__icon">↑</i><span>Export / Import</span></a>
     </nav>
+    <button class="theme-toggle-btn" id="theme-toggle"><span id="theme-icon">☽</span><span id="theme-label">Dark mode</span></button>
     <div class="sidebar-streak" id="sidebar-streak">
       <span class="sidebar-streak__fire">🔥</span>
       <div>
